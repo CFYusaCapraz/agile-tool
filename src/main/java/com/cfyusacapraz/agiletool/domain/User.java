@@ -34,6 +34,9 @@ public class User extends BaseEntity<UUID> implements UserDetails {
     @Column(nullable = false)
     private Roles role;
 
+    @ManyToOne
+    private Team team;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = role.getPermissions().stream()
@@ -69,6 +72,4 @@ public class User extends BaseEntity<UUID> implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
-
 }
