@@ -30,6 +30,9 @@ public class User extends BaseEntity<UUID> implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private String name;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Roles role;
