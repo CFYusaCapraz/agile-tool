@@ -15,7 +15,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "retro_items")
-public class RetroItem extends BaseEntity<UUID> {
+public class RetroItem extends BaseEntity<Long> {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "column_id", nullable = false)
@@ -29,8 +29,8 @@ public class RetroItem extends BaseEntity<UUID> {
     private String content;
 
     @Column(name = "vote_count", nullable = false)
-    private int voteCount = 0;
+    private int voteCount;
 
     @Column(nullable = false)
-    private boolean isVisible = false;
+    private boolean isVisible;
 }

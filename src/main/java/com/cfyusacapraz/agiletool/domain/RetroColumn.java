@@ -9,7 +9,6 @@ import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,7 +16,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "retro_columns")
-public class RetroColumn extends BaseEntity<UUID> {
+public class RetroColumn extends BaseEntity<Long> {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "retro_id", nullable = false)
