@@ -1,4 +1,4 @@
-package com.cfyusacapraz.agiletool.api.response;
+package com.cfyusacapraz.agiletool.api.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationResponse {
+public class RefreshTokenRequest {
 
-    private String accessToken;
-
-    private String refreshToken;
+    private String token;
 }
