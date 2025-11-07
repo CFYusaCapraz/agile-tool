@@ -1,4 +1,4 @@
-package com.cfyusacapraz.agiletool.service.impl;
+package com.cfyusacapraz.agiletool.service;
 
 import com.cfyusacapraz.agiletool.api.request.AuthenticationRequest;
 import com.cfyusacapraz.agiletool.api.request.RefreshTokenRequest;
