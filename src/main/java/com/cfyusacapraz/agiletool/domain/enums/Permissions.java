@@ -13,5 +13,12 @@ public enum Permissions {
     TEAM_UPDATE,
     TEAM_DELETE,
 
+    // Retro permissions
+    RETRO_CREATE,
+    RETRO_READ,
+    RETRO_UPDATE,
+    RETRO_DELETE,
+    RETRO_PARTICIPATE,
+    RETRO_REVEAL_ITEMS
     // More permissions will be added later (POKER_*, RETRO_*, etc.)
 }
