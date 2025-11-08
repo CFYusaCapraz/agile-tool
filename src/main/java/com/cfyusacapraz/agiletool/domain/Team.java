@@ -4,6 +4,7 @@ import com.cfyusacapraz.agiletool.domain.base.BaseEntity;
 import com.cfyusacapraz.agiletool.domain.enums.TeamStatus;
 import com.cfyusacapraz.agiletool.dto.TeamDto;
 import com.cfyusacapraz.agiletool.mapper.TeamMapper;
+import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -40,11 +41,11 @@ public class Team extends BaseEntity<UUID, TeamDto> {
 
     @Override
     public TeamDto toDto() {
-        return TeamMapper.INSTANCE.toDto(this);
+        return TeamMapper.INSTANCE.toDto(this, new CycleAvoidingMappingContext());
     }
 
     @Override
     public Team fromDto(TeamDto dto) {
-        return TeamMapper.INSTANCE.toEntity(dto);
+        return TeamMapper.INSTANCE.toEntity(dto, new CycleAvoidingMappingContext());
     }
 }

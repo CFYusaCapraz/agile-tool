@@ -2,6 +2,8 @@ package com.cfyusacapraz.agiletool.mapper;
 
 import com.cfyusacapraz.agiletool.domain.Team;
 import com.cfyusacapraz.agiletool.dto.TeamDto;
+import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
@@ -11,7 +13,7 @@ public interface TeamMapper {
 
     TeamMapper INSTANCE = Mappers.getMapper(TeamMapper.class);
 
-    TeamDto toDto(Team team);
+    TeamDto toDto(Team team, @Context CycleAvoidingMappingContext context);
 
-    Team toEntity(TeamDto teamDto);
+    Team toEntity(TeamDto teamDto, @Context CycleAvoidingMappingContext context);
 }

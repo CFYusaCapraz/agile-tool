@@ -4,6 +4,7 @@ import com.cfyusacapraz.agiletool.domain.base.BaseEntity;
 import com.cfyusacapraz.agiletool.domain.enums.RetroStatus;
 import com.cfyusacapraz.agiletool.dto.RetroDto;
 import com.cfyusacapraz.agiletool.mapper.RetroMapper;
+import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -58,11 +59,11 @@ public class Retro extends BaseEntity<UUID, RetroDto> {
 
     @Override
     public RetroDto toDto() {
-        return RetroMapper.INSTANCE.toDto(this);
+        return RetroMapper.INSTANCE.toDto(this, new CycleAvoidingMappingContext());
     }
 
     @Override
     public Retro fromDto(RetroDto dto) {
-        return RetroMapper.INSTANCE.toEntity(dto);
+        return RetroMapper.INSTANCE.toEntity(dto, new CycleAvoidingMappingContext());
     }
 }

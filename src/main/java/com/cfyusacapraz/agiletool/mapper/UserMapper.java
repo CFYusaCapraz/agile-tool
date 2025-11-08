@@ -2,6 +2,8 @@ package com.cfyusacapraz.agiletool.mapper;
 
 import com.cfyusacapraz.agiletool.domain.User;
 import com.cfyusacapraz.agiletool.dto.UserDto;
+import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -12,8 +14,8 @@ public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-    UserDto toDTO(User user);
+    UserDto toDTO(User user, @Context CycleAvoidingMappingContext context);
 
     @Mapping(target = "password", ignore = true)
-    User toEntity(UserDto userDTO);
+    User toEntity(UserDto userDTO, @Context CycleAvoidingMappingContext context);
 }

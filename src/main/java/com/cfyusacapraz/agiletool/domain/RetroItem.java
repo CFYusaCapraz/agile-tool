@@ -3,6 +3,7 @@ package com.cfyusacapraz.agiletool.domain;
 import com.cfyusacapraz.agiletool.domain.base.BaseEntity;
 import com.cfyusacapraz.agiletool.dto.RetroItemDto;
 import com.cfyusacapraz.agiletool.mapper.RetroItemMapper;
+import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -36,11 +37,11 @@ public class RetroItem extends BaseEntity<Long, RetroItemDto> {
 
     @Override
     public RetroItemDto toDto() {
-        return RetroItemMapper.INSTANCE.toDto(this);
+        return RetroItemMapper.INSTANCE.toDto(this, new CycleAvoidingMappingContext());
     }
 
     @Override
     public RetroItem fromDto(RetroItemDto dto) {
-        return RetroItemMapper.INSTANCE.toEntity(dto);
+        return RetroItemMapper.INSTANCE.toEntity(dto, new CycleAvoidingMappingContext());
     }
 }

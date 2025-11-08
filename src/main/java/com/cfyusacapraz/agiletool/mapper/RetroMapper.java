@@ -2,6 +2,8 @@ package com.cfyusacapraz.agiletool.mapper;
 
 import com.cfyusacapraz.agiletool.domain.Retro;
 import com.cfyusacapraz.agiletool.dto.RetroDto;
+import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -12,8 +14,8 @@ public interface RetroMapper {
 
     RetroMapper INSTANCE = Mappers.getMapper(RetroMapper.class);
 
-    RetroDto toDto(Retro retro);
+    RetroDto toDto(Retro retro, @Context CycleAvoidingMappingContext context);
 
     @Mapping(target = "fromDto", ignore = true)
-    Retro toEntity(RetroDto retroDto);
+    Retro toEntity(RetroDto retroDto, @Context CycleAvoidingMappingContext context);
 }

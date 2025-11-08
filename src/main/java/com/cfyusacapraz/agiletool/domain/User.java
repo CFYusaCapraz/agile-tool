@@ -4,6 +4,7 @@ import com.cfyusacapraz.agiletool.domain.base.BaseEntity;
 import com.cfyusacapraz.agiletool.domain.enums.Roles;
 import com.cfyusacapraz.agiletool.dto.UserDto;
 import com.cfyusacapraz.agiletool.mapper.UserMapper;
+import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -58,11 +59,11 @@ public class User extends BaseEntity<UUID, UserDto> implements UserDetails {
 
     @Override
     public UserDto toDto() {
-        return UserMapper.INSTANCE.toDTO(this);
+        return UserMapper.INSTANCE.toDTO(this, new CycleAvoidingMappingContext());
     }
 
     @Override
     public User fromDto(UserDto dto) {
-        return UserMapper.INSTANCE.toEntity(dto);
+        return UserMapper.INSTANCE.toEntity(dto, new CycleAvoidingMappingContext());
     }
 }
