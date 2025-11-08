@@ -28,6 +28,7 @@ public class Team extends BaseEntity<UUID, TeamDto> {
     private TeamStatus status;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "team")
+    @Builder.Default
     private Set<User> members = new HashSet<>();
 
     @OneToOne

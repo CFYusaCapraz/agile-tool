@@ -23,6 +23,7 @@ public class TeamResponse implements Serializable {
 
     private TeamStatus status;
 
+    @Builder.Default
     private Set<UUID> members = new HashSet<>();
 
     private UUID scrumMaster;
