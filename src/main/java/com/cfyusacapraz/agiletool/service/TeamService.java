@@ -11,9 +11,12 @@ import java.util.concurrent.CompletableFuture;
 
 public interface TeamService {
 
-    @PreAuthorize("hasRole(ADMIN)")
+    @PreAuthorize("hasRole(ADMIN) or hasAuthority(TEAM_CREATE)")
     CompletableFuture<TeamDto> create(@NotNull TeamCreateRequest teamCreateRequest);
 
     @PreAuthorize("hasRole(ADMIN) or hasAuthority(TEAM_UPDATE)")
     CompletableFuture<TeamDto> update(@NotNull UUID teamId, @NotNull TeamUpdateRequest teamCreateRequest);
+
+    @PreAuthorize("hasRole(ADMIN) or hasAuthority(TEAM_DELETE)")
+    CompletableFuture<Void> delete(@NotNull UUID teamId);
 }

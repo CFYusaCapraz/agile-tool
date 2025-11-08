@@ -3,6 +3,7 @@ package com.cfyusacapraz.agiletool.api.controller;
 import com.cfyusacapraz.agiletool.api.constants.ApiEndpoints;
 import com.cfyusacapraz.agiletool.api.request.TeamCreateRequest;
 import com.cfyusacapraz.agiletool.api.request.TeamUpdateRequest;
+import com.cfyusacapraz.agiletool.api.response.base.BaseApiResponse;
 import com.cfyusacapraz.agiletool.api.response.base.SaveEntityResponse;
 import com.cfyusacapraz.agiletool.service.TeamService;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +32,11 @@ public class TeamController {
                                                                   @Validated @RequestBody TeamUpdateRequest teamCreateRequest) {
         return teamService.update(teamId, teamCreateRequest)
                 .thenApply(SaveEntityResponse::new);
+    }
+
+    @DeleteMapping(path = "/{teamId}")
+    public CompletableFuture<BaseApiResponse> updateTeam(@PathVariable UUID teamId) {
+        return teamService.delete(teamId)
+                .thenApply(voidResult -> new BaseApiResponse(null, true));
     }
 }

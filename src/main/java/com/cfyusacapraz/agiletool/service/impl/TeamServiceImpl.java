@@ -3,6 +3,7 @@ package com.cfyusacapraz.agiletool.service.impl;
 import com.cfyusacapraz.agiletool.api.request.TeamCreateRequest;
 import com.cfyusacapraz.agiletool.api.request.TeamUpdateRequest;
 import com.cfyusacapraz.agiletool.domain.Team;
+import com.cfyusacapraz.agiletool.domain.enums.TeamStatus;
 import com.cfyusacapraz.agiletool.dto.TeamDto;
 import com.cfyusacapraz.agiletool.repository.TeamRepository;
 import com.cfyusacapraz.agiletool.service.TeamService;
@@ -64,5 +65,19 @@ public class TeamServiceImpl implements TeamService {
                     return updatedTeam;
                 })
                 .thenApply(Team::toDto);
+    }
+
+    @Override
+    @Transactional
+    @Async
+    public CompletableFuture<Void> delete(@NotNull UUID teamId) {
+        return CompletableFuture.completedFuture(teamRepository.findById(teamId))
+                .thenApply(optionalTeam -> optionalTeam.orElseThrow(() ->
+                        new IllegalArgumentException("Team with id " + teamId + " not found")))
+                .thenAccept(team -> {
+                    team.setStatus(TeamStatus.ARCHIVED);
+                    teamRepository.save(team);
+                    log.info("Team deleted successfully with id: {}", teamId);
+                });
     }
 }
