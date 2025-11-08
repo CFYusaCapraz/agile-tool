@@ -2,9 +2,11 @@ package com.cfyusacapraz.agiletool.api.controller;
 
 import com.cfyusacapraz.agiletool.api.constants.ApiEndpoints;
 import com.cfyusacapraz.agiletool.api.request.UserCreateRequest;
+import com.cfyusacapraz.agiletool.api.request.UserFilterRequest;
 import com.cfyusacapraz.agiletool.api.request.UserUpdateRequest;
 import com.cfyusacapraz.agiletool.api.response.UserResponse;
 import com.cfyusacapraz.agiletool.api.response.base.BaseApiResponse;
+import com.cfyusacapraz.agiletool.api.response.base.PagedListResultResponse;
 import com.cfyusacapraz.agiletool.api.response.base.SaveEntityResponse;
 import com.cfyusacapraz.agiletool.api.response.base.SingleResultResponse;
 import com.cfyusacapraz.agiletool.service.UserService;
@@ -12,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -45,5 +48,14 @@ public class UserController {
     public CompletableFuture<SingleResultResponse<UserResponse>> getUser(@PathVariable("userId") UUID id) {
         return userService.getById(id)
                 .thenApply(userDto -> new SingleResultResponse<>(new UserResponse(userDto)));
+    }
+
+    @GetMapping
+    public CompletableFuture<PagedListResultResponse<List<UserResponse>>> getAllUsers(@Validated UserFilterRequest userFilterRequest) {
+        return userService.getAll(userFilterRequest)
+                .thenApply(pair -> {
+                    List<UserResponse> userResponses = pair.getFirst().stream().map(UserResponse::new).toList();
+                    return new PagedListResultResponse<>(userResponses, pair.getSecond());
+                });
     }
 }

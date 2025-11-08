@@ -1,11 +1,15 @@
 package com.cfyusacapraz.agiletool.service;
 
 import com.cfyusacapraz.agiletool.api.request.UserCreateRequest;
+import com.cfyusacapraz.agiletool.api.request.UserFilterRequest;
 import com.cfyusacapraz.agiletool.api.request.UserUpdateRequest;
+import com.cfyusacapraz.agiletool.api.response.base.PageData;
 import com.cfyusacapraz.agiletool.dto.UserDto;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.util.Pair;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -22,4 +26,7 @@ public interface UserService {
 
     @PreAuthorize("hasRole(ADMIN) or authentication.principal.id == #id")
     CompletableFuture<UserDto> getById(@NotNull UUID id);
+
+    @PreAuthorize("hasRole(ADMIN)")
+    CompletableFuture<Pair<List<UserDto>, PageData>> getAll(@NotNull UserFilterRequest userFilterRequest);
 }
