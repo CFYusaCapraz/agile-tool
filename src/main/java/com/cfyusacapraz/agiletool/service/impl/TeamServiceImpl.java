@@ -31,11 +31,9 @@ public class TeamServiceImpl implements TeamService {
         log.info("Creating team with name: {}", teamCreateRequest.getName());
 
         teamRepository.findByName(teamCreateRequest.getName())
-                .thenAccept(optionalTeam -> {
-                    optionalTeam.ifPresent(team -> {
-                        throw new IllegalArgumentException("Team with name " + teamCreateRequest.getName() + " already exists");
-                    });
-                }).join();
+                .thenAccept(optionalTeam -> optionalTeam.ifPresent(team -> {
+                    throw new IllegalArgumentException("Team with name " + teamCreateRequest.getName() + " already exists");
+                })).join();
 
         return userService.getById(teamCreateRequest.getScrumMaster())
                 .thenApply(userDto -> Team.builder().build())
