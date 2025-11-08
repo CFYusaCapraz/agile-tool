@@ -2,14 +2,12 @@ package com.cfyusacapraz.agiletool.api.controller;
 
 import com.cfyusacapraz.agiletool.api.constants.ApiEndpoints;
 import com.cfyusacapraz.agiletool.api.request.TeamCreateRequest;
+import com.cfyusacapraz.agiletool.api.request.TeamUpdateRequest;
 import com.cfyusacapraz.agiletool.api.response.base.SaveEntityResponse;
 import com.cfyusacapraz.agiletool.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -25,6 +23,13 @@ public class TeamController {
     @PostMapping
     public CompletableFuture<SaveEntityResponse<UUID>> createTeam(@Validated @RequestBody TeamCreateRequest teamCreateRequest) {
         return teamService.create(teamCreateRequest)
+                .thenApply(SaveEntityResponse::new);
+    }
+
+    @PutMapping(path = "/{teamId}")
+    public CompletableFuture<SaveEntityResponse<UUID>> updateTeam(@PathVariable UUID teamId,
+                                                                  @Validated @RequestBody TeamUpdateRequest teamCreateRequest) {
+        return teamService.update(teamId, teamCreateRequest)
                 .thenApply(SaveEntityResponse::new);
     }
 }
