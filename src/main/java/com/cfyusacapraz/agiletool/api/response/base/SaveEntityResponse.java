@@ -12,4 +12,9 @@ import java.io.Serializable;
 public class SaveEntityResponse<ID extends Serializable> extends BaseApiResponse implements Serializable {
 
     private ID entityId;
+
+    @Override
+    public boolean isSuccess() {
+        return true;
+    }
 }

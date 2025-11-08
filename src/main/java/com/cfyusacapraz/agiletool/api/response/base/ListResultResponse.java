@@ -13,4 +13,9 @@ import java.util.List;
 public class ListResultResponse<D extends List<?>> extends BaseApiResponse implements Serializable {
 
     private D resultList;
+
+    @Override
+    public boolean isSuccess() {
+        return true;
+    }
 }

@@ -12,4 +12,9 @@ import java.io.Serializable;
 public class SingleResultResponse<D> extends BaseApiResponse implements Serializable {
 
     private D result;
+
+    @Override
+    public boolean isSuccess() {
+        return true;
+    }
 }
