@@ -3,7 +3,6 @@ package com.cfyusacapraz.agiletool.mapper;
 import com.cfyusacapraz.agiletool.domain.Team;
 import com.cfyusacapraz.agiletool.dto.TeamDto;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
@@ -14,6 +13,5 @@ public interface TeamMapper {
 
     TeamDto toDto(Team team);
 
-    @Mapping(target = "fromDto", ignore = true)
     Team toEntity(TeamDto teamDto);
 }
