@@ -3,8 +3,10 @@ package com.cfyusacapraz.agiletool.api.controller;
 import com.cfyusacapraz.agiletool.api.constants.ApiEndpoints;
 import com.cfyusacapraz.agiletool.api.request.TeamCreateRequest;
 import com.cfyusacapraz.agiletool.api.request.TeamUpdateRequest;
+import com.cfyusacapraz.agiletool.api.response.TeamResponse;
 import com.cfyusacapraz.agiletool.api.response.base.BaseApiResponse;
 import com.cfyusacapraz.agiletool.api.response.base.SaveEntityResponse;
+import com.cfyusacapraz.agiletool.api.response.base.SingleResultResponse;
 import com.cfyusacapraz.agiletool.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -28,15 +30,21 @@ public class TeamController {
     }
 
     @PutMapping(path = "/{teamId}")
-    public CompletableFuture<SaveEntityResponse<UUID>> updateTeam(@PathVariable UUID teamId,
+    public CompletableFuture<SaveEntityResponse<UUID>> updateTeam(@PathVariable("teamId") UUID id,
                                                                   @Validated @RequestBody TeamUpdateRequest teamCreateRequest) {
-        return teamService.update(teamId, teamCreateRequest)
+        return teamService.update(id, teamCreateRequest)
                 .thenApply(SaveEntityResponse::new);
     }
 
     @DeleteMapping(path = "/{teamId}")
-    public CompletableFuture<BaseApiResponse> updateTeam(@PathVariable UUID teamId) {
-        return teamService.delete(teamId)
+    public CompletableFuture<BaseApiResponse> updateTeam(@PathVariable("teamId") UUID id) {
+        return teamService.delete(id)
                 .thenApply(voidResult -> new BaseApiResponse(null, true));
+    }
+
+    @GetMapping(path = "/{teamId}")
+    public CompletableFuture<SingleResultResponse<TeamResponse>> getTeam(@PathVariable("teamId") UUID id) {
+        return teamService.getById(id)
+                .thenApply(teamDto -> new SingleResultResponse<>(new TeamResponse(teamDto)));
     }
 }

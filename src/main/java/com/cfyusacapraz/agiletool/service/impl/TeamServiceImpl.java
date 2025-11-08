@@ -50,12 +50,12 @@ public class TeamServiceImpl implements TeamService {
     @Override
     @Transactional
     @Async
-    public CompletableFuture<TeamDto> update(@NotNull UUID teamId, @NotNull TeamUpdateRequest teamUpdateRequest) {
-        log.info("Updating team with id: {}", teamId);
+    public CompletableFuture<TeamDto> update(@NotNull UUID id, @NotNull TeamUpdateRequest teamUpdateRequest) {
+        log.info("Updating team with id: {}", id);
 
-        return CompletableFuture.completedFuture(teamRepository.findById(teamId))
+        return CompletableFuture.completedFuture(teamRepository.findById(id))
                 .thenApply(optionalTeam -> optionalTeam.orElseThrow(() ->
-                        new IllegalArgumentException("Team with id " + teamId + " not found")))
+                        new IllegalArgumentException("Team with id " + id + " not found")))
                 .thenApply(team -> {
                     team.setName(teamUpdateRequest.getName());
                     team.setStatus(teamUpdateRequest.getStatus());
@@ -70,14 +70,24 @@ public class TeamServiceImpl implements TeamService {
     @Override
     @Transactional
     @Async
-    public CompletableFuture<Void> delete(@NotNull UUID teamId) {
-        return CompletableFuture.completedFuture(teamRepository.findById(teamId))
+    public CompletableFuture<Void> delete(@NotNull UUID id) {
+        return CompletableFuture.completedFuture(teamRepository.findById(id))
                 .thenApply(optionalTeam -> optionalTeam.orElseThrow(() ->
-                        new IllegalArgumentException("Team with id " + teamId + " not found")))
+                        new IllegalArgumentException("Team with id " + id + " not found")))
                 .thenAccept(team -> {
                     team.setStatus(TeamStatus.ARCHIVED);
                     teamRepository.save(team);
-                    log.info("Team deleted successfully with id: {}", teamId);
+                    log.info("Team deleted successfully with id: {}", id);
                 });
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Async
+    public CompletableFuture<TeamDto> getById(@NotNull UUID id) {
+        return CompletableFuture.completedFuture(teamRepository.findById(id))
+                .thenApply(optionalTeam -> optionalTeam.orElseThrow(() ->
+                        new IllegalArgumentException("Team with id " + id + " not found")))
+                .thenApply(Team::toDto);
     }
 }

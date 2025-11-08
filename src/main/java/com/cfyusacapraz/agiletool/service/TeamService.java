@@ -15,8 +15,11 @@ public interface TeamService {
     CompletableFuture<TeamDto> create(@NotNull TeamCreateRequest teamCreateRequest);
 
     @PreAuthorize("hasRole(ADMIN) or hasAuthority(TEAM_UPDATE)")
-    CompletableFuture<TeamDto> update(@NotNull UUID teamId, @NotNull TeamUpdateRequest teamCreateRequest);
+    CompletableFuture<TeamDto> update(@NotNull UUID id, @NotNull TeamUpdateRequest teamCreateRequest);
 
     @PreAuthorize("hasRole(ADMIN) or hasAuthority(TEAM_DELETE)")
-    CompletableFuture<Void> delete(@NotNull UUID teamId);
+    CompletableFuture<Void> delete(@NotNull UUID id);
+
+    @PreAuthorize("hasRole(ADMIN) or hasAuthority(TEAM_READ)")
+    CompletableFuture<TeamDto> getById(@NotNull UUID id);
 }
