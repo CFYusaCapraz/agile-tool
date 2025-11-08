@@ -110,7 +110,6 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     @Async
     public CompletableFuture<Pair<List<UserDto>, PageData>> getAll(@NotNull UserFilterRequest userFilterRequest) {
-        UserSpecification userSpecification = new UserSpecification(userFilterRequest);
         return PaginationService.getPagedAndFilteredData(userRepository, userFilterRequest, UserSpecification.class)
                 .thenApply(userPage -> {
                     List<UserDto> userDtoList = userPage.stream()
