@@ -1,6 +1,7 @@
 package com.cfyusacapraz.agiletool.service.impl;
 
 import com.cfyusacapraz.agiletool.api.request.UserCreationRequest;
+import com.cfyusacapraz.agiletool.api.request.UserUpdateRequest;
 import com.cfyusacapraz.agiletool.domain.User;
 import com.cfyusacapraz.agiletool.dto.UserDto;
 import com.cfyusacapraz.agiletool.repository.UserRepository;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -49,5 +51,25 @@ public class AdminServiceImpl implements AdminService {
         log.info("User created successfully with id: {}", user.getId());
 
         return CompletableFuture.completedFuture(user.toDto());
+    }
+
+    @Override
+    public CompletableFuture<UserDto> updateUser(UUID id, UserUpdateRequest userUpdateRequest) {
+        log.info("Updating user with id: {}", id);
+
+        return CompletableFuture.completedFuture(userRepository.findById(id))
+                .thenApply(optionalUser -> optionalUser.orElseThrow(() ->
+                        new IllegalArgumentException("User with id " + id + " not found")))
+                .thenApply(user -> {
+                    user.setEmail(userUpdateRequest.getEmail());
+                    user.setName(userUpdateRequest.getName());
+                    user.setRole(userUpdateRequest.getRole());
+                    return user;
+                })
+                .thenApply(userRepository::save)
+                .thenApply(user -> {
+                    log.info("User updated successfully with id: {}", user.getId());
+                    return user.toDto();
+                });
     }
 }
