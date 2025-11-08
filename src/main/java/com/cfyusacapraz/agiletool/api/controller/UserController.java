@@ -3,6 +3,7 @@ package com.cfyusacapraz.agiletool.api.controller;
 import com.cfyusacapraz.agiletool.api.constants.ApiEndpoints;
 import com.cfyusacapraz.agiletool.api.request.UserCreateRequest;
 import com.cfyusacapraz.agiletool.api.request.UserUpdateRequest;
+import com.cfyusacapraz.agiletool.api.response.base.BaseApiResponse;
 import com.cfyusacapraz.agiletool.api.response.base.SaveEntityResponse;
 import com.cfyusacapraz.agiletool.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -30,5 +31,11 @@ public class UserController {
     public CompletableFuture<SaveEntityResponse<UUID>> updateUser(@PathVariable("userId") UUID id, @Validated @RequestBody UserUpdateRequest userUpdateRequest) {
         return userService.update(id, userUpdateRequest)
                 .thenApply(userDto -> new SaveEntityResponse<>(userDto.getId()));
+    }
+
+    @DeleteMapping(path = "/{userId}")
+    public CompletableFuture<BaseApiResponse> deleteUser(@PathVariable("userId") UUID id) {
+        return userService.delete(id)
+                .thenApply(aVoid -> new BaseApiResponse(null, true));
     }
 }

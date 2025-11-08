@@ -20,4 +20,9 @@ public class BaseApiResponse implements Serializable {
     private boolean success;
 
     private String correlationId;
+
+    public BaseApiResponse(String id, boolean success) {
+        this.id = id;
+        this.success = success;
+    }
 }

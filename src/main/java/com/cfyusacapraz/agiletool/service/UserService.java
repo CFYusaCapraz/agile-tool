@@ -3,7 +3,7 @@ package com.cfyusacapraz.agiletool.service;
 import com.cfyusacapraz.agiletool.api.request.UserCreateRequest;
 import com.cfyusacapraz.agiletool.api.request.UserUpdateRequest;
 import com.cfyusacapraz.agiletool.dto.UserDto;
-import jakarta.validation.constraints.NotNull;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.UUID;
@@ -16,4 +16,7 @@ public interface UserService {
 
     @PreAuthorize("hasRole(ADMIN) or authentication.principal.id == #id")
     CompletableFuture<UserDto> update(@NotNull UUID id, @NotNull UserUpdateRequest userUpdateRequest);
+
+    @PreAuthorize("hasRole(ADMIN)")
+    CompletableFuture<Void> delete(@NotNull UUID id);
 }

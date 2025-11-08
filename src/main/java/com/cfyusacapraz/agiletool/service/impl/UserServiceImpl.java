@@ -74,4 +74,19 @@ public class UserServiceImpl implements UserService {
                     return user.toDto();
                 });
     }
+
+    @Override
+    @Transactional
+    @Async
+    public CompletableFuture<Void> delete(@NotNull UUID id) {
+        log.info("Deleting user with id: {}", id);
+
+        return CompletableFuture.runAsync(() -> {
+            if (!userRepository.existsById(id)) {
+                throw new IllegalArgumentException("User with id " + id + " not found");
+            }
+            userRepository.deleteById(id);
+            log.info("User deleted successfully with id: {}", id);
+        });
+    }
 }
