@@ -19,4 +19,7 @@ public interface UserService {
 
     @PreAuthorize("hasRole(ADMIN)")
     CompletableFuture<Void> delete(@NotNull UUID id);
+
+    @PreAuthorize("hasRole(ADMIN) or authentication.principal.id == #id")
+    CompletableFuture<UserDto> getById(@NotNull UUID id);
 }

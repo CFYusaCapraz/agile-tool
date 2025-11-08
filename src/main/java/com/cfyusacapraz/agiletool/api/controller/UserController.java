@@ -3,8 +3,10 @@ package com.cfyusacapraz.agiletool.api.controller;
 import com.cfyusacapraz.agiletool.api.constants.ApiEndpoints;
 import com.cfyusacapraz.agiletool.api.request.UserCreateRequest;
 import com.cfyusacapraz.agiletool.api.request.UserUpdateRequest;
+import com.cfyusacapraz.agiletool.api.response.UserResponse;
 import com.cfyusacapraz.agiletool.api.response.base.BaseApiResponse;
 import com.cfyusacapraz.agiletool.api.response.base.SaveEntityResponse;
+import com.cfyusacapraz.agiletool.api.response.base.SingleResultResponse;
 import com.cfyusacapraz.agiletool.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -37,5 +39,11 @@ public class UserController {
     public CompletableFuture<BaseApiResponse> deleteUser(@PathVariable("userId") UUID id) {
         return userService.delete(id)
                 .thenApply(aVoid -> new BaseApiResponse(null, true));
+    }
+
+    @GetMapping(path = "/{userId}")
+    public CompletableFuture<SingleResultResponse<UserResponse>> getUser(@PathVariable("userId") UUID id) {
+        return userService.getById(id)
+                .thenApply(userDto -> new SingleResultResponse<>(new UserResponse(userDto)));
     }
 }

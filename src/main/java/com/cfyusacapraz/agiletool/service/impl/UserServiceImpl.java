@@ -89,4 +89,14 @@ public class UserServiceImpl implements UserService {
             log.info("User deleted successfully with id: {}", id);
         });
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Async
+    public CompletableFuture<UserDto> getById(@NotNull UUID id) {
+        return CompletableFuture.completedFuture(userRepository.findById(id))
+                .thenApply(optionalUser -> optionalUser.orElseThrow(() ->
+                        new IllegalArgumentException("User with id " + id + " not found")))
+                .thenApply(User::toDto);
+    }
 }
