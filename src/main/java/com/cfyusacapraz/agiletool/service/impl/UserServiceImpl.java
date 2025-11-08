@@ -1,11 +1,11 @@
 package com.cfyusacapraz.agiletool.service.impl;
 
-import com.cfyusacapraz.agiletool.api.request.UserCreationRequest;
+import com.cfyusacapraz.agiletool.api.request.UserCreateRequest;
 import com.cfyusacapraz.agiletool.api.request.UserUpdateRequest;
 import com.cfyusacapraz.agiletool.domain.User;
 import com.cfyusacapraz.agiletool.dto.UserDto;
 import com.cfyusacapraz.agiletool.repository.UserRepository;
-import com.cfyusacapraz.agiletool.service.AdminService;
+import com.cfyusacapraz.agiletool.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AdminServiceImpl implements AdminService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
@@ -29,22 +29,22 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional
     @Async
-    public CompletableFuture<UserDto> createUser(@NotNull UserCreationRequest userCreationRequest) {
-        log.info("Creating user with email: {}", userCreationRequest.getEmail());
+    public CompletableFuture<UserDto> create(@NotNull UserCreateRequest userCreateRequest) {
+        log.info("Creating user with email: {}", userCreateRequest.getEmail());
 
         // Check if user with the same email already exists
-        userRepository.findByEmail(userCreationRequest.getEmail())
+        userRepository.findByEmail(userCreateRequest.getEmail())
                 .thenAccept(optionalUser -> optionalUser.ifPresent(user -> {
-                    throw new IllegalArgumentException("User with email " + userCreationRequest.getEmail() + " already exists");
+                    throw new IllegalArgumentException("User with email " + userCreateRequest.getEmail() + " already exists");
                 }))
                 .join();
 
         // Create new user
         User user = User.builder()
-                .email(userCreationRequest.getEmail())
-                .password(passwordEncoder.encode(userCreationRequest.getPassword()))
-                .name(userCreationRequest.getName())
-                .role(userCreationRequest.getRole())
+                .email(userCreateRequest.getEmail())
+                .password(passwordEncoder.encode(userCreateRequest.getPassword()))
+                .name(userCreateRequest.getName())
+                .role(userCreateRequest.getRole())
                 .build();
 
         user = userRepository.save(user);
@@ -54,7 +54,9 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public CompletableFuture<UserDto> updateUser(UUID id, UserUpdateRequest userUpdateRequest) {
+    @Transactional
+    @Async
+    public CompletableFuture<UserDto> update(@NotNull UUID id, @NotNull UserUpdateRequest userUpdateRequest) {
         log.info("Updating user with id: {}", id);
 
         return CompletableFuture.completedFuture(userRepository.findById(id))

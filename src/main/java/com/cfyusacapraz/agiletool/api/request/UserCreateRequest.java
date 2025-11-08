@@ -15,7 +15,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserCreationRequest implements Serializable {
+public class UserCreateRequest implements Serializable {
 
     @NotBlank
     @Email
