@@ -104,11 +104,11 @@ public class TeamServiceImpl implements TeamService {
         TeamSpecification teamSpecification = new TeamSpecification(teamFilterRequest);
         return PaginationService.getPagedAndFilteredData(teamRepository, teamFilterRequest, TeamSpecification.class)
                 .thenApply(teamPage -> {
-                    List<TeamDto> userDtoList = teamPage.stream()
+                    List<TeamDto> teamDtoList = teamPage.stream()
                             .map(Team::toDto)
                             .toList();
                     PageData pageData = new PageData(teamFilterRequest.getPageNumber(), teamPage.getTotalElements(), teamPage.getTotalPages());
-                    return Pair.of(userDtoList, pageData);
+                    return Pair.of(teamDtoList, pageData);
                 });
     }
 }
