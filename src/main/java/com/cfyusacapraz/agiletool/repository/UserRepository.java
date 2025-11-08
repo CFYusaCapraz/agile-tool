@@ -1,6 +1,7 @@
 package com.cfyusacapraz.agiletool.repository;
 
 import com.cfyusacapraz.agiletool.domain.User;
+import com.cfyusacapraz.agiletool.dto.UserDto;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.scheduling.annotation.Async;
@@ -9,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public interface UserRepository extends BaseEntityRepository<User, UUID> {
+public interface UserRepository extends BaseEntityRepository<User, UserDto, UUID> {
 
     @Query("select u from User u where u.email = :email")
     @Async

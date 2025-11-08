@@ -2,6 +2,8 @@ package com.cfyusacapraz.agiletool.domain;
 
 import com.cfyusacapraz.agiletool.domain.base.BaseEntity;
 import com.cfyusacapraz.agiletool.domain.enums.Roles;
+import com.cfyusacapraz.agiletool.dto.UserDto;
+import com.cfyusacapraz.agiletool.mapper.UserMapper;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,7 +22,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User extends BaseEntity<UUID> implements UserDetails {
+public class User extends BaseEntity<UUID, UserDto> implements UserDetails {
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -52,5 +54,15 @@ public class User extends BaseEntity<UUID> implements UserDetails {
     @Override
     public String getUsername() {
         return email;
+    }
+
+    @Override
+    public UserDto toDto() {
+        return UserMapper.INSTANCE.toDTO(this);
+    }
+
+    @Override
+    public User fromDto(UserDto dto) {
+        return UserMapper.INSTANCE.toEntity(dto);
     }
 }

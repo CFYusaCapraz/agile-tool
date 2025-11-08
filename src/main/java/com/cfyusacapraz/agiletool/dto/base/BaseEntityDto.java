@@ -15,5 +15,7 @@ public abstract class BaseEntityDto<ID extends Serializable> {
 
     private ID id;
 
+    private int version;
+
     private AuditMetadataDto auditMetadata;
 }

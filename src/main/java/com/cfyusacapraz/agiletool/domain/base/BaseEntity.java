@@ -1,5 +1,6 @@
 package com.cfyusacapraz.agiletool.domain.base;
 
+import com.cfyusacapraz.agiletool.dto.base.BaseEntityDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,12 +16,15 @@ import java.io.Serializable;
 @MappedSuperclass
 @Getter
 @Setter
-public abstract class BaseEntity<ID extends Serializable> implements Serializable {
+public abstract class BaseEntity<ID extends Serializable, D extends BaseEntityDto<ID>> implements Serializable {
 
     @Id
     @GeneratedValue
     @Column(name = "id")
     private ID id;
+
+    @Version
+    private int version;
 
     @Embedded
     private AuditMetadata auditMetadata;
@@ -34,5 +38,9 @@ public abstract class BaseEntity<ID extends Serializable> implements Serializabl
             auditMetadata = new AuditMetadata();
         }
     }
+
+    public abstract D toDto();
+
+    public abstract BaseEntity<ID, D> fromDto(D dto);
 }
 

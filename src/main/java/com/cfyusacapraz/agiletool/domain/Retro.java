@@ -2,6 +2,8 @@ package com.cfyusacapraz.agiletool.domain;
 
 import com.cfyusacapraz.agiletool.domain.base.BaseEntity;
 import com.cfyusacapraz.agiletool.domain.enums.RetroStatus;
+import com.cfyusacapraz.agiletool.dto.RetroDto;
+import com.cfyusacapraz.agiletool.mapper.RetroMapper;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +21,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "retros")
-public class Retro extends BaseEntity<UUID> {
+public class Retro extends BaseEntity<UUID, RetroDto> {
 
     @Column(nullable = false)
     private String title;
@@ -53,4 +55,14 @@ public class Retro extends BaseEntity<UUID> {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<User> participants = new HashSet<>();
+
+    @Override
+    public RetroDto toDto() {
+        return RetroMapper.INSTANCE.toDto(this);
+    }
+
+    @Override
+    public Retro fromDto(RetroDto dto) {
+        return RetroMapper.INSTANCE.toEntity(dto);
+    }
 }

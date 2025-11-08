@@ -1,6 +1,8 @@
 package com.cfyusacapraz.agiletool.domain;
 
 import com.cfyusacapraz.agiletool.domain.base.BaseEntity;
+import com.cfyusacapraz.agiletool.dto.RetroItemDto;
+import com.cfyusacapraz.agiletool.mapper.RetroItemMapper;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +15,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "retro_items")
-public class RetroItem extends BaseEntity<Long> {
+public class RetroItem extends BaseEntity<Long, RetroItemDto> {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "column_id", nullable = false)
@@ -31,4 +33,14 @@ public class RetroItem extends BaseEntity<Long> {
 
     @Column(nullable = false)
     private boolean isVisible;
+
+    @Override
+    public RetroItemDto toDto() {
+        return RetroItemMapper.INSTANCE.toDto(this);
+    }
+
+    @Override
+    public RetroItem fromDto(RetroItemDto dto) {
+        return RetroItemMapper.INSTANCE.toEntity(dto);
+    }
 }

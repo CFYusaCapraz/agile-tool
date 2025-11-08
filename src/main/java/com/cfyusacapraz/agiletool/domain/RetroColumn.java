@@ -1,6 +1,8 @@
 package com.cfyusacapraz.agiletool.domain;
 
 import com.cfyusacapraz.agiletool.domain.base.BaseEntity;
+import com.cfyusacapraz.agiletool.dto.RetroColumnDto;
+import com.cfyusacapraz.agiletool.mapper.RetroColumnMapper;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,7 +18,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "retro_columns")
-public class RetroColumn extends BaseEntity<Long> {
+public class RetroColumn extends BaseEntity<Long, RetroColumnDto> {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "retro_id", nullable = false)
@@ -33,4 +35,14 @@ public class RetroColumn extends BaseEntity<Long> {
 
     @OneToMany(mappedBy = "column", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<RetroItem> items = new HashSet<>();
+
+    @Override
+    public RetroColumnDto toDto() {
+        return RetroColumnMapper.INSTANCE.toDto(this);
+    }
+
+    @Override
+    public RetroColumn fromDto(RetroColumnDto dto) {
+        return RetroColumnMapper.INSTANCE.toEntity(dto);
+    }
 }

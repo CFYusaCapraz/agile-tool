@@ -1,0 +1,19 @@
+package com.cfyusacapraz.agiletool.mapper;
+
+import com.cfyusacapraz.agiletool.domain.RetroColumn;
+import com.cfyusacapraz.agiletool.dto.RetroColumnDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
+import org.mapstruct.factory.Mappers;
+
+@Mapper(config = BaseEntityMapperConfig.class, unmappedTargetPolicy = ReportingPolicy.ERROR, uses = {RetroItemMapper.class, RetroMapper.class})
+public interface RetroColumnMapper {
+
+    RetroColumnMapper INSTANCE = Mappers.getMapper(RetroColumnMapper.class);
+
+    RetroColumnDto toDto(RetroColumn retroColumn);
+
+    @Mapping(target = "fromDto", ignore = true)
+    RetroColumn toEntity(RetroColumnDto retroColumnDto);
+}
