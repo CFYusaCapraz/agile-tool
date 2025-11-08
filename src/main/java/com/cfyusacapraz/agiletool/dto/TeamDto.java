@@ -1,5 +1,6 @@
 package com.cfyusacapraz.agiletool.dto;
 
+import com.cfyusacapraz.agiletool.domain.enums.TeamStatus;
 import com.cfyusacapraz.agiletool.dto.base.BaseEntityDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,6 +18,8 @@ import java.util.UUID;
 public class TeamDto extends BaseEntityDto<UUID> {
 
     private String name;
+
+    private TeamStatus status;
 
     private Set<UserDto> members = new HashSet<>();
 

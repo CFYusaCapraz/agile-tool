@@ -29,13 +29,13 @@ public class UserController {
     @PostMapping
     public CompletableFuture<SaveEntityResponse<UUID>> createUser(@Validated @RequestBody UserCreateRequest userCreateRequest) {
         return userService.create(userCreateRequest)
-                .thenApply(userDto -> new SaveEntityResponse<>(userDto.getId()));
+                .thenApply(SaveEntityResponse::new);
     }
 
     @PutMapping(path = "/{userId}")
     public CompletableFuture<SaveEntityResponse<UUID>> updateUser(@PathVariable("userId") UUID id, @Validated @RequestBody UserUpdateRequest userUpdateRequest) {
         return userService.update(id, userUpdateRequest)
-                .thenApply(userDto -> new SaveEntityResponse<>(userDto.getId()));
+                .thenApply(SaveEntityResponse::new);
     }
 
     @DeleteMapping(path = "/{userId}")
