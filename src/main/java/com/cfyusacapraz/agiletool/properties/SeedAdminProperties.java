@@ -1,0 +1,23 @@
+package com.cfyusacapraz.agiletool.properties;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
+
+@ConfigurationProperties(prefix = PropertiesPrefixConstants.SEED_ADMIN_PREFIX)
+@Data
+@Validated
+public class SeedAdminProperties {
+
+    private boolean enabled = false;
+
+    @NotBlank
+    private String email = "example@example.com";
+
+    @NotBlank
+    private String password = "password";
+
+    @NotBlank
+    private String name = "Admin User";
+}
