@@ -8,9 +8,13 @@ import com.cfyusacapraz.agiletool.service.AuthenticationService;
 import com.cfyusacapraz.agiletool.util.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -23,40 +27,48 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     @Override
-    public AuthenticationResponse authenticate(@NotNull AuthenticationRequest request) {
+    @Transactional(readOnly = true)
+    @Async
+    public CompletableFuture<AuthenticationResponse> authenticate(@NotNull AuthenticationRequest request) {
+        String email = request.getEmail();
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
+                        email,
                         request.getPassword()
                 )
         );
-        var user = userRepository.findByEmail(request.getEmail())
-                .join()
-                .orElseThrow();
-        var accessToken = jwtService.generateToken(user);
-        var refreshToken = jwtService.generateRefreshToken(user);
-        return AuthenticationResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+        return userRepository.findByEmail(email)
+                .thenApply(optionalUser -> optionalUser.orElseThrow(() ->
+                        new IllegalArgumentException("User with email " + email + " not found")))
+                .thenApply(user -> {
+                    String accessToken = jwtService.generateToken(user);
+                    String refreshToken = jwtService.generateRefreshToken(user);
+                    return AuthenticationResponse.builder()
+                            .accessToken(accessToken)
+                            .refreshToken(refreshToken)
+                            .build();
+                });
     }
 
     @Override
-    public AuthenticationResponse refreshToken(RefreshTokenRequest request) {
+    @Transactional(readOnly = true)
+    @Async
+    public CompletableFuture<AuthenticationResponse> refreshToken(RefreshTokenRequest request) {
         final String userEmail = jwtService.extractUsername(request.getToken());
-        var user = userRepository.findByEmail(userEmail)
-                .join()
-                .orElseThrow();
+        return userRepository.findByEmail(userEmail)
+                .thenApply(optionalUser -> optionalUser.orElseThrow(() ->
+                        new IllegalArgumentException("User with email " + userEmail + " not found")))
+                .thenApply(user -> {
+                    if (jwtService.isTokenValid(request.getToken(), user)) {
+                        String accessToken = jwtService.generateToken(user);
+                        String refreshToken = jwtService.generateRefreshToken(user);
+                        return AuthenticationResponse.builder()
+                                .accessToken(accessToken)
+                                .refreshToken(refreshToken)
+                                .build();
+                    }
 
-        if (jwtService.isTokenValid(request.getToken(), user)) {
-            var accessToken = jwtService.generateToken(user);
-            var refreshToken = jwtService.generateRefreshToken(user);
-            return AuthenticationResponse.builder()
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .build();
-        }
-
-        throw new IllegalArgumentException("Invalid refresh token");
+                    throw new IllegalArgumentException("Invalid refresh token");
+                });
     }
 }
