@@ -119,4 +119,14 @@ public class UserServiceImpl implements UserService {
                     return Pair.of(userDtoList, pageData);
                 });
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Async
+    public CompletableFuture<UserDto> getByEmail(@NotNull String email) {
+        return userRepository.findByEmail(email)
+                .thenApply(optionalUser -> optionalUser.orElseThrow(() ->
+                        new IllegalArgumentException("User with email " + email + " not found")))
+                .thenApply(User::toDto);
+    }
 }

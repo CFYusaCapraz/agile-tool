@@ -15,18 +15,21 @@ import java.util.concurrent.CompletableFuture;
 
 public interface UserService {
 
-    @PreAuthorize(value = "hasRole(ADMIN)")
+    @PreAuthorize(value = "hasRole('ADMIN')")
     CompletableFuture<UserDto> create(@NotNull UserCreateRequest userCreateRequest);
 
-    @PreAuthorize("hasRole(ADMIN) or authentication.principal.id == #id")
+    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == #id")
     CompletableFuture<UserDto> update(@NotNull UUID id, @NotNull UserUpdateRequest userUpdateRequest);
 
-    @PreAuthorize("hasRole(ADMIN)")
+    @PreAuthorize("hasRole('ADMIN')")
     CompletableFuture<Void> delete(@NotNull UUID id);
 
-    @PreAuthorize("hasRole(ADMIN) or authentication.principal.id == #id")
+    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == #id")
     CompletableFuture<UserDto> getById(@NotNull UUID id);
 
-    @PreAuthorize("hasRole(ADMIN)")
+    @PreAuthorize("hasRole('ADMIN')")
     CompletableFuture<Pair<List<UserDto>, PageData>> getAll(@NotNull UserFilterRequest userFilterRequest);
+
+    @PreAuthorize("hasRole('ADMIN') or authentication.principal.email == #email")
+    CompletableFuture<UserDto> getByEmail(@NotNull String email);
 }
