@@ -45,6 +45,7 @@ public class Retro extends BaseEntity<UUID, RetroDto> {
 
     @OneToMany(mappedBy = "retro", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("order ASC")
+    @Builder.Default
     private Set<RetroColumn> columns = new HashSet<>();
 
     @ManyToMany
@@ -53,6 +54,7 @@ public class Retro extends BaseEntity<UUID, RetroDto> {
             joinColumns = @JoinColumn(name = "retro_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
+    @Builder.Default
     private Set<User> participants = new HashSet<>();
 
     @Override

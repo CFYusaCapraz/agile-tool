@@ -5,7 +5,6 @@ import com.cfyusacapraz.agiletool.dto.RetroDto;
 import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
@@ -16,6 +15,5 @@ public interface RetroMapper {
 
     RetroDto toDto(Retro retro, @Context CycleAvoidingMappingContext context);
 
-    @Mapping(target = "fromDto", ignore = true)
     Retro toEntity(RetroDto retroDto, @Context CycleAvoidingMappingContext context);
 }
