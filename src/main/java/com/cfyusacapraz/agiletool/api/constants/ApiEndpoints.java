@@ -8,6 +8,7 @@ public final class ApiEndpoints {
     public static final String AUTH_BASE_URL = BASE_API_URL + "/auth";
     public static final String USER_BASE_URL = BASE_API_URL + "/users";
     public static final String TEAM_BASE_URL = BASE_API_URL + "/teams";
+    public static final String RETRO_BASE_URL = BASE_API_URL + "/retros";
 
     private ApiEndpoints() {
         throw new IllegalStateException("Utility class");
