@@ -9,6 +9,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public interface RetroService {
@@ -16,5 +17,9 @@ public interface RetroService {
     @PreAuthorize("hasRole('SCRUM_MASTER') or hasAuthority('RETRO_CREATE')")
     CompletableFuture<RetroDto> create(@NotNull RetroCreateRequest retroCreateRequest);
 
+    @PreAuthorize("hasAuthority('RETRO_READ')")
     CompletableFuture<Pair<List<RetroDto>, PageData>> getAll(@NotNull BasePagedApiRequest basePagedApiRequest);
+
+    @PreAuthorize("hasAuthority('RETRO_READ')")
+    CompletableFuture<RetroDto> getById(@NotNull UUID id);
 }

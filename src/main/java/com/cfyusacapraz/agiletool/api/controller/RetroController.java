@@ -3,9 +3,11 @@ package com.cfyusacapraz.agiletool.api.controller;
 import com.cfyusacapraz.agiletool.api.constants.ApiEndpoints;
 import com.cfyusacapraz.agiletool.api.request.RetroCreateRequest;
 import com.cfyusacapraz.agiletool.api.request.base.BasePagedApiRequest;
+import com.cfyusacapraz.agiletool.api.response.RetroDetailResponse;
 import com.cfyusacapraz.agiletool.api.response.RetroListResponse;
 import com.cfyusacapraz.agiletool.api.response.base.PagedListResultResponse;
 import com.cfyusacapraz.agiletool.api.response.base.SaveEntityResponse;
+import com.cfyusacapraz.agiletool.api.response.base.SingleResultResponse;
 import com.cfyusacapraz.agiletool.service.RetroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -36,5 +38,11 @@ public class RetroController {
                     List<RetroListResponse> retroListResponse = pair.getFirst().stream().map(RetroListResponse::new).toList();
                     return new PagedListResultResponse<>(retroListResponse, pair.getSecond());
                 });
+    }
+
+    @GetMapping("/{retroId}")
+    public CompletableFuture<SingleResultResponse<RetroDetailResponse>> getRetrospectiveById(@PathVariable("retroId") UUID id) {
+        return retroService.getById(id)
+                .thenApply(retro -> new SingleResultResponse<>(new RetroDetailResponse(retro)));
     }
 }

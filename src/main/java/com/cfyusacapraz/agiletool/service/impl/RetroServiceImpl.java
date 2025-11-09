@@ -7,6 +7,7 @@ import com.cfyusacapraz.agiletool.domain.Retro;
 import com.cfyusacapraz.agiletool.domain.Retro_;
 import com.cfyusacapraz.agiletool.domain.Team_;
 import com.cfyusacapraz.agiletool.domain.User;
+import com.cfyusacapraz.agiletool.domain.enums.Roles;
 import com.cfyusacapraz.agiletool.dto.RetroDto;
 import com.cfyusacapraz.agiletool.repository.RetroRepository;
 import com.cfyusacapraz.agiletool.service.AuthenticationService;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -82,6 +84,33 @@ public class RetroServiceImpl implements RetroService {
                                 PageData pageData = new PageData(retroPage.getNumber(), retroPage.getTotalElements(), retroPage.getTotalPages());
                                 return Pair.of(retroDtoList, pageData);
                             });
+                });
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Async
+    public CompletableFuture<RetroDto> getById(@NotNull UUID id) {
+        return authenticationService.getCurrentUser()
+                .thenCompose(userDto -> {
+                    CompletableFuture<Retro> retroCompletableFuture = CompletableFuture.completedFuture(retroRepository.findById(id))
+                            .thenApply(optionalRetro -> optionalRetro.orElseThrow(() ->
+                                    new IllegalArgumentException("Retrospective session not found with ID: " + id)));
+
+                    return retroCompletableFuture.thenApply(retro -> {
+                        assert userDto != null;
+                        boolean isAdmin = userDto.getRole() == Roles.ROLE_ADMIN;
+                        boolean belongsToRetroTeam = userDto.getTeam() != null
+                                && retro.getTeam() != null
+                                && userDto.getTeam().getId() != null
+                                && userDto.getTeam().getId().equals(retro.getTeam().getId());
+
+                        if (!isAdmin || !belongsToRetroTeam) {
+                            throw new SecurityException("User is not authorized to access this retrospective");
+                        }
+
+                        return retro.toDto();
+                    });
                 });
     }
 }
