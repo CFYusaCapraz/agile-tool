@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.OffsetDateTime;
 
 /**
  * Base entity class with generic ID type and embedded audit metadata.
@@ -35,8 +36,17 @@ public abstract class BaseEntity<ID extends Serializable, D extends BaseEntityDt
     @PrePersist
     protected void initializeAudit() {
         if (auditMetadata == null) {
+            OffsetDateTime now = OffsetDateTime.now();
+            auditMetadata = new AuditMetadata(now, now, null, null);
+        }
+    }
+
+    @PreUpdate
+    protected void touchAudit() {
+        if (auditMetadata == null) {
             auditMetadata = new AuditMetadata();
         }
+        auditMetadata.setUpdatedAt(OffsetDateTime.now());
     }
 
     public abstract D toDto();
