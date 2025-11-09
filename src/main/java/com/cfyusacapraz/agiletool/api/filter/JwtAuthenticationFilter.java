@@ -1,4 +1,4 @@
-package com.cfyusacapraz.agiletool.config;
+package com.cfyusacapraz.agiletool.api.filter;
 
 import com.cfyusacapraz.agiletool.util.JwtService;
 import jakarta.servlet.FilterChain;
