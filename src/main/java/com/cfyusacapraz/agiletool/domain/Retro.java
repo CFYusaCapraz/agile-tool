@@ -6,10 +6,7 @@ import com.cfyusacapraz.agiletool.dto.RetroDto;
 import com.cfyusacapraz.agiletool.mapper.RetroMapper;
 import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.OffsetDateTime;
 import java.util.HashSet;
@@ -22,6 +19,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "retros")
+@Builder
 public class Retro extends BaseEntity<UUID, RetroDto> {
 
     @Column(nullable = false)
