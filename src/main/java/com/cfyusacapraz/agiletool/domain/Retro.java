@@ -38,6 +38,7 @@ public class Retro extends BaseEntity<UUID, RetroDto> {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private RetroStatus status = RetroStatus.DRAFT;
 
     @Column(name = "scheduled_date")
