@@ -99,7 +99,7 @@ public class RetroServiceImpl implements RetroService {
 
                     return retroCompletableFuture.thenApply(retro -> {
                         assert userDto != null;
-                        boolean isAdmin = userDto.getRole() == Roles.ROLE_ADMIN;
+                        boolean isAdmin = userDto.getRole().getName().equalsIgnoreCase(Roles.ROLE_ADMIN.name());
                         boolean belongsToRetroTeam = userDto.getTeam() != null
                                 && retro.getTeam() != null
                                 && userDto.getTeam().getId() != null
