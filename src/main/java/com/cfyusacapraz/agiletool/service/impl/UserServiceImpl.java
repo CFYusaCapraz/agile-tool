@@ -45,10 +45,8 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(userCreateRequest.getEmail())
                 .thenCompose(optionalUser -> {
                     if (optionalUser.isPresent()) {
-                        CompletableFuture<UserDto> failed = new CompletableFuture<>();
-                        failed.completeExceptionally(new IllegalArgumentException(
+                        return CompletableFuture.failedFuture(new IllegalArgumentException(
                                 "User with email " + userCreateRequest.getEmail() + " already exists"));
-                        return failed;
                     }
 
                     User user = User.builder()
@@ -76,12 +74,14 @@ public class UserServiceImpl implements UserService {
         return CompletableFuture.completedFuture(userRepository.findById(id))
                 .thenApply(optionalUser -> optionalUser.orElseThrow(() ->
                         new IllegalArgumentException("User with id " + id + " not found")))
-                .thenApply(user -> {
-                    user.setEmail(userUpdateRequest.getEmail());
-                    user.setName(userUpdateRequest.getName());
-                    user.setRole(userUpdateRequest.getRole());
-                    return user;
-                })
+                .thenCompose(user ->
+                        roleService.getById(userUpdateRequest.getRoleId())
+                                .thenApply(roleDto -> {
+                                    user.setEmail(userUpdateRequest.getEmail());
+                                    user.setName(userUpdateRequest.getName());
+                                    user.setRole(new Role().fromDto(roleDto));
+                                    return user;
+                                }))
                 .thenApply(userRepository::save)
                 .thenApply(user -> {
                     log.info("User updated successfully with id: {}", user.getId());
