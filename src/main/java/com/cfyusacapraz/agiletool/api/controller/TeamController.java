@@ -27,20 +27,22 @@ public class TeamController {
     private final TeamService teamService;
 
     @PostMapping
-    public CompletableFuture<SaveEntityResponse<UUID>> createTeam(@Validated @RequestBody TeamCreateRequest teamCreateRequest) {
+    public CompletableFuture<SaveEntityResponse<UUID>> createTeam(
+            @Validated @RequestBody TeamCreateRequest teamCreateRequest) {
         return teamService.create(teamCreateRequest)
                 .thenApply(SaveEntityResponse::new);
     }
 
     @PutMapping(path = "/{teamId}")
     public CompletableFuture<SaveEntityResponse<UUID>> updateTeam(@PathVariable("teamId") UUID id,
-                                                                  @Validated @RequestBody TeamUpdateRequest teamCreateRequest) {
+                                                                  @Validated @RequestBody
+                                                                  TeamUpdateRequest teamCreateRequest) {
         return teamService.update(id, teamCreateRequest)
                 .thenApply(SaveEntityResponse::new);
     }
 
     @DeleteMapping(path = "/{teamId}")
-    public CompletableFuture<BaseApiResponse> updateTeam(@PathVariable("teamId") UUID id) {
+    public CompletableFuture<BaseApiResponse> deleteTeam(@PathVariable("teamId") UUID id) {
         return teamService.delete(id)
                 .thenApply(voidResult -> new BaseApiResponse(null, true));
     }
@@ -52,7 +54,8 @@ public class TeamController {
     }
 
     @GetMapping
-    public CompletableFuture<PagedListResultResponse<List<TeamResponse>>> getAllTeams(@Validated TeamFilterRequest teamFilterRequest) {
+    public CompletableFuture<PagedListResultResponse<List<TeamResponse>>> getAllTeams(
+            @Validated TeamFilterRequest teamFilterRequest) {
         return teamService.getAll(teamFilterRequest)
                 .thenApply(pair -> {
                     List<TeamResponse> teamResponses = pair.getFirst().stream().map(TeamResponse::new).toList();
