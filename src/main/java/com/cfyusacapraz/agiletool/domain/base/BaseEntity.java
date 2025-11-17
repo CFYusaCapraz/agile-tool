@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.Objects;
 
 /**
  * Base entity class with generic ID type and embedded audit metadata.
@@ -52,5 +53,16 @@ public abstract class BaseEntity<ID extends Serializable, D extends BaseEntityDt
     public abstract D toDto();
 
     public abstract BaseEntity<ID, D> fromDto(D dto);
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof BaseEntity<?, ?> that)) return false;
+        return Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId());
+    }
 }
 
