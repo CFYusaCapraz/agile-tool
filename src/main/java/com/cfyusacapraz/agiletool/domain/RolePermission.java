@@ -2,6 +2,8 @@ package com.cfyusacapraz.agiletool.domain;
 
 import com.cfyusacapraz.agiletool.domain.base.BaseEntity;
 import com.cfyusacapraz.agiletool.dto.RolePermissionDto;
+import com.cfyusacapraz.agiletool.mapper.RolePermissionMapper;
+import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,11 +26,11 @@ public class RolePermission extends BaseEntity<Long, RolePermissionDto> {
 
     @Override
     public RolePermissionDto toDto() {
-        return null;
+        return RolePermissionMapper.INSTANCE.toDto(this, new CycleAvoidingMappingContext());
     }
 
     @Override
-    public BaseEntity<Long, RolePermissionDto> fromDto(RolePermissionDto dto) {
-        return null;
+    public RolePermission fromDto(RolePermissionDto dto) {
+        return RolePermissionMapper.INSTANCE.toEntity(dto, new CycleAvoidingMappingContext());
     }
 }
