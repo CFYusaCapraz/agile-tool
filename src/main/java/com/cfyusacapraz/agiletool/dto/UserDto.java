@@ -1,6 +1,5 @@
 package com.cfyusacapraz.agiletool.dto;
 
-import com.cfyusacapraz.agiletool.domain.enums.Roles;
 import com.cfyusacapraz.agiletool.dto.base.BaseEntityDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +18,7 @@ public class UserDto extends BaseEntityDto<UUID> {
 
     private String name;
 
-    private Roles role;
+    private RoleDto role;
 
     private TeamDto team;
 }

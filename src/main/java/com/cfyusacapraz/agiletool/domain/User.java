@@ -1,7 +1,6 @@
 package com.cfyusacapraz.agiletool.domain;
 
 import com.cfyusacapraz.agiletool.domain.base.BaseEntity;
-import com.cfyusacapraz.agiletool.domain.enums.Roles;
 import com.cfyusacapraz.agiletool.dto.UserDto;
 import com.cfyusacapraz.agiletool.mapper.UserMapper;
 import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
@@ -34,20 +33,21 @@ public class User extends BaseEntity<UUID, UserDto> implements UserDetails {
     @Column(nullable = false)
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Roles role;
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
 
     @ManyToOne
     private Team team;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Set<GrantedAuthority> authorities = role.getPermissions().stream()
-                .map(permission -> new SimpleGrantedAuthority(permission.name()))
-                .collect(Collectors.toSet());
+        Set<GrantedAuthority> authorities =
+                role.getRolePermissions().stream().map(RolePermission::getPermission)
+                        .map(permission -> new SimpleGrantedAuthority(permission.getName()))
+                        .collect(Collectors.toSet());
 
-        authorities.add(new SimpleGrantedAuthority(role.name()));
+        authorities.add(new SimpleGrantedAuthority(role.getName()));
 
         return authorities;
     }
