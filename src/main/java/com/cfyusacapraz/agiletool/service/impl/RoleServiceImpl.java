@@ -25,9 +25,17 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(readOnly = true)
     @Async
     public CompletableFuture<RoleDto> getById(@NotNull UUID id) {
-        return CompletableFuture.completedFuture(roleRepository.findById(id))
-                .thenApply(optionalRole -> optionalRole.orElseThrow(
-                        () -> new IllegalArgumentException("Role with id " + id + " not found")))
+        return CompletableFuture.completedFuture(roleRepository.findById(id)).thenApply(
+                        optionalRole -> optionalRole.orElseThrow(
+                                () -> new IllegalArgumentException("Role with id " + id + " not found")))
                 .thenApply(Role::toDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Async
+    public CompletableFuture<RoleDto> getByName(@NotNull String name) {
+        return roleRepository.findByName(name).thenApply(optionalRole -> optionalRole.orElseThrow(
+                () -> new IllegalArgumentException("Role with name " + name + " not found"))).thenApply(Role::toDto);
     }
 }

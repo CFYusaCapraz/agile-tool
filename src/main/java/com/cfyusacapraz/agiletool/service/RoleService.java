@@ -9,4 +9,6 @@ import java.util.concurrent.CompletableFuture;
 public interface RoleService {
 
     CompletableFuture<RoleDto> getById(@NotNull UUID id);
+
+    CompletableFuture<RoleDto> getByName(@NotNull String name);
 }
