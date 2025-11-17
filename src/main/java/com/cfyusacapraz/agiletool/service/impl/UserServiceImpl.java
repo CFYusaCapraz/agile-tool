@@ -4,10 +4,12 @@ import com.cfyusacapraz.agiletool.api.request.UserCreateRequest;
 import com.cfyusacapraz.agiletool.api.request.UserFilterRequest;
 import com.cfyusacapraz.agiletool.api.request.UserUpdateRequest;
 import com.cfyusacapraz.agiletool.api.response.base.PageData;
+import com.cfyusacapraz.agiletool.domain.Role;
 import com.cfyusacapraz.agiletool.domain.User;
 import com.cfyusacapraz.agiletool.dto.UserDto;
 import com.cfyusacapraz.agiletool.repository.UserRepository;
 import com.cfyusacapraz.agiletool.repository.spec.UserSpecification;
+import com.cfyusacapraz.agiletool.service.RoleService;
 import com.cfyusacapraz.agiletool.service.UserService;
 import com.cfyusacapraz.agiletool.util.PaginationService;
 import lombok.RequiredArgsConstructor;
@@ -32,31 +34,37 @@ public class UserServiceImpl implements UserService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final RoleService roleService;
+
     @Override
     @Transactional
     @Async
     public CompletableFuture<UserDto> create(@NotNull UserCreateRequest userCreateRequest) {
         log.info("Creating user with email: {}", userCreateRequest.getEmail());
 
-        // Check if user with the same email already exists
-        userRepository.findByEmail(userCreateRequest.getEmail())
-                .thenAccept(optionalUser -> optionalUser.ifPresent(user -> {
-                    throw new IllegalArgumentException("User with email " + userCreateRequest.getEmail() + " already exists");
-                }))
-                .join();
+        return userRepository.findByEmail(userCreateRequest.getEmail())
+                .thenCompose(optionalUser -> {
+                    if (optionalUser.isPresent()) {
+                        CompletableFuture<UserDto> failed = new CompletableFuture<>();
+                        failed.completeExceptionally(new IllegalArgumentException(
+                                "User with email " + userCreateRequest.getEmail() + " already exists"));
+                        return failed;
+                    }
 
-        // Create new user
-        User user = User.builder()
-                .email(userCreateRequest.getEmail())
-                .password(passwordEncoder.encode(userCreateRequest.getPassword()))
-                .name(userCreateRequest.getName())
-                .role(userCreateRequest.getRole())
-                .build();
+                    User user = User.builder()
+                            .email(userCreateRequest.getEmail())
+                            .password(passwordEncoder.encode(userCreateRequest.getPassword()))
+                            .name(userCreateRequest.getName())
+                            .build();
 
-        user = userRepository.save(user);
-        log.info("User created successfully with id: {}", user.getId());
-
-        return CompletableFuture.completedFuture(user.toDto());
+                    return roleService.getById(userCreateRequest.getRoleId())
+                            .thenApply(roleDto -> {
+                                user.setRole(new Role().fromDto(roleDto));
+                                userRepository.save(user);
+                                log.info("User created successfully with id: {}", user.getId());
+                                return user.toDto();
+                            });
+                });
     }
 
     @Override
@@ -115,7 +123,8 @@ public class UserServiceImpl implements UserService {
                     List<UserDto> userDtoList = userPage.stream()
                             .map(User::toDto)
                             .toList();
-                    PageData pageData = new PageData(userFilterRequest.getPageNumber(), userPage.getTotalElements(), userPage.getTotalPages());
+                    PageData pageData = new PageData(userFilterRequest.getPageNumber(), userPage.getTotalElements(),
+                            userPage.getTotalPages());
                     return Pair.of(userDtoList, pageData);
                 });
     }

@@ -1,6 +1,5 @@
 package com.cfyusacapraz.agiletool.api.request;
 
-import com.cfyusacapraz.agiletool.domain.enums.Roles;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -28,5 +28,5 @@ public class UserCreateRequest implements Serializable {
     private String name;
 
     @NotNull
-    private Roles role;
+    private UUID roleId;
 }
