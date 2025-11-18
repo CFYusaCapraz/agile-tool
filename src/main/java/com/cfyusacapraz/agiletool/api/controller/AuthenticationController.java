@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.concurrent.CompletableFuture;
-
 @RestController
 @RequestMapping(path = ApiEndpoints.AUTH_BASE_URL, produces = ApiEndpoints.RESPONSE_CONTENT_TYPE)
 @RequiredArgsConstructor
@@ -24,14 +22,15 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/login")
-    public CompletableFuture<SingleResultResponse<AuthenticationResponse>> login(@Validated @RequestBody AuthenticationRequest request) {
-        return authenticationService.authenticate(request)
-                .thenApply(SingleResultResponse::new);
+    public SingleResultResponse<AuthenticationResponse> login(@Validated @RequestBody AuthenticationRequest request) {
+        AuthenticationResponse response = authenticationService.authenticate(request);
+        return new SingleResultResponse<>(response);
     }
 
     @PostMapping("/refresh")
-    public CompletableFuture<SingleResultResponse<AuthenticationResponse>> refreshToken(@Validated @RequestBody RefreshTokenRequest request) {
-        return authenticationService.refreshToken(request)
-                .thenApply(SingleResultResponse::new);
+    public SingleResultResponse<AuthenticationResponse> refreshToken(
+            @Validated @RequestBody RefreshTokenRequest request) {
+        AuthenticationResponse response = authenticationService.refreshToken(request);
+        return new SingleResultResponse<>(response);
     }
 }
