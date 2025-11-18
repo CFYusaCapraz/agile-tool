@@ -2,8 +2,6 @@ package com.cfyusacapraz.agiletool.domain;
 
 import com.cfyusacapraz.agiletool.domain.base.BaseEntity;
 import com.cfyusacapraz.agiletool.dto.UserDto;
-import com.cfyusacapraz.agiletool.mapper.UserMapper;
-import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -57,15 +55,5 @@ public class User extends BaseEntity<UUID, UserDto> implements UserDetails {
     @Override
     public String getUsername() {
         return email;
-    }
-
-    @Override
-    public UserDto toDto() {
-        return UserMapper.INSTANCE.toDto(this, new CycleAvoidingMappingContext());
-    }
-
-    @Override
-    public User fromDto(UserDto dto) {
-        return UserMapper.INSTANCE.toEntity(dto, new CycleAvoidingMappingContext());
     }
 }

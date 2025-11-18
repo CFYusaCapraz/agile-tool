@@ -2,8 +2,6 @@ package com.cfyusacapraz.agiletool.domain;
 
 import com.cfyusacapraz.agiletool.domain.base.BaseEntity;
 import com.cfyusacapraz.agiletool.dto.PermissionDto;
-import com.cfyusacapraz.agiletool.mapper.PermissionMapper;
-import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -31,14 +29,4 @@ public class Permission extends BaseEntity<UUID, PermissionDto> {
 
     @OneToMany(mappedBy = "permission")
     private Set<RolePermission> rolePermissions;
-
-    @Override
-    public PermissionDto toDto() {
-        return PermissionMapper.INSTANCE.toDto(this, new CycleAvoidingMappingContext());
-    }
-
-    @Override
-    public Permission fromDto(PermissionDto dto) {
-        return PermissionMapper.INSTANCE.toEntity(dto, new CycleAvoidingMappingContext());
-    }
 }

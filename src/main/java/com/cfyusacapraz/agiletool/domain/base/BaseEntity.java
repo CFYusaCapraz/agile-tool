@@ -56,10 +56,6 @@ public abstract class BaseEntity<ID extends Serializable, D extends BaseEntityDt
         auditMetadata.setUpdatedAt(OffsetDateTime.now());
     }
 
-    public abstract D toDto();
-
-    public abstract BaseEntity<ID, D> fromDto(D dto);
-
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof BaseEntity<?, ?> that)) return false;
