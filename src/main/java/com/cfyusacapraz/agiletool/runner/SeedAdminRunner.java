@@ -26,7 +26,7 @@ import java.util.List;
 @ConditionalOnBooleanProperty(prefix = "agiletool.seed-admin", name = "enabled")
 @RequiredArgsConstructor
 @Slf4j
-@Order(1)
+@Order(3)
 public class SeedAdminRunner implements ApplicationRunner {
 
     private final UserService userService;

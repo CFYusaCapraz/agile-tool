@@ -15,7 +15,7 @@ public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-    UserDto toDTO(User user, @Context CycleAvoidingMappingContext context);
+    UserDto toDto(User user, @Context CycleAvoidingMappingContext context);
 
     @Mapping(target = "password", ignore = true)
     User toEntity(UserDto userDTO, @Context CycleAvoidingMappingContext context);

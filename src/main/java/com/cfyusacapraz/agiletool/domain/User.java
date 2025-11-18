@@ -61,7 +61,7 @@ public class User extends BaseEntity<UUID, UserDto> implements UserDetails {
 
     @Override
     public UserDto toDto() {
-        return UserMapper.INSTANCE.toDTO(this, new CycleAvoidingMappingContext());
+        return UserMapper.INSTANCE.toDto(this, new CycleAvoidingMappingContext());
     }
 
     @Override

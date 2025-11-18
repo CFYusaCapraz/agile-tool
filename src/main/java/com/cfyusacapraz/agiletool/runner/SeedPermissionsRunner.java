@@ -15,7 +15,7 @@ import java.util.Arrays;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@Order(0)
+@Order(1)
 public class SeedPermissionsRunner implements ApplicationRunner {
 
     private final PermissionRepository permissionRepository;
