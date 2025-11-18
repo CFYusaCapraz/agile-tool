@@ -5,13 +5,13 @@ import com.cfyusacapraz.agiletool.dto.RetroDto;
 import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
-import org.mapstruct.factory.Mappers;
 
-@Mapper(config = BaseEntityMapperConfig.class, unmappedTargetPolicy = ReportingPolicy.ERROR, uses = {UserMapper.class, TeamMapper.class, RetroColumnMapper.class})
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, config = BaseEntityMapperConfig.class,
+        unmappedTargetPolicy = ReportingPolicy.ERROR,
+        uses = {UserMapper.class, TeamMapper.class, RetroColumnMapper.class})
 public interface RetroMapper {
-
-    RetroMapper INSTANCE = Mappers.getMapper(RetroMapper.class);
 
     RetroDto toDto(Retro retro, @Context CycleAvoidingMappingContext context);
 

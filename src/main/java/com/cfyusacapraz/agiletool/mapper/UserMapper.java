@@ -3,17 +3,11 @@ package com.cfyusacapraz.agiletool.mapper;
 import com.cfyusacapraz.agiletool.domain.User;
 import com.cfyusacapraz.agiletool.dto.UserDto;
 import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
-import org.mapstruct.Context;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.*;
 
-@Mapper(config = BaseEntityMapperConfig.class, unmappedTargetPolicy = ReportingPolicy.ERROR,
-        uses = {RoleMapper.class, TeamMapper.class})
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, config = BaseEntityMapperConfig.class,
+        unmappedTargetPolicy = ReportingPolicy.ERROR, uses = {RoleMapper.class, TeamMapper.class})
 public interface UserMapper {
-
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     UserDto toDto(User user, @Context CycleAvoidingMappingContext context);
 

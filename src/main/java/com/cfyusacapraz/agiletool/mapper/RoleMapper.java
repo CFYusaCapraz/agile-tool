@@ -5,13 +5,11 @@ import com.cfyusacapraz.agiletool.dto.RoleDto;
 import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.MappingConstants;
 
-@Mapper(config = BaseEntityMapperConfig.class, unmappedTargetPolicy = org.mapstruct.ReportingPolicy.ERROR,
-        uses = RolePermissionMapper.class)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, config = BaseEntityMapperConfig.class,
+        unmappedTargetPolicy = org.mapstruct.ReportingPolicy.ERROR, uses = RolePermissionMapper.class)
 public interface RoleMapper {
-
-    RoleMapper INSTANCE = Mappers.getMapper(RoleMapper.class);
 
     RoleDto toDto(Role role, @Context CycleAvoidingMappingContext context);
 

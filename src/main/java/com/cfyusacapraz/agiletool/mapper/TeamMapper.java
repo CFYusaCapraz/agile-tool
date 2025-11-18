@@ -5,13 +5,12 @@ import com.cfyusacapraz.agiletool.dto.TeamDto;
 import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
-import org.mapstruct.factory.Mappers;
 
-@Mapper(config = BaseEntityMapperConfig.class, unmappedTargetPolicy = ReportingPolicy.ERROR, uses = {UserMapper.class})
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, config = BaseEntityMapperConfig.class,
+        unmappedTargetPolicy = ReportingPolicy.ERROR, uses = {UserMapper.class})
 public interface TeamMapper {
-
-    TeamMapper INSTANCE = Mappers.getMapper(TeamMapper.class);
 
     TeamDto toDto(Team team, @Context CycleAvoidingMappingContext context);
 

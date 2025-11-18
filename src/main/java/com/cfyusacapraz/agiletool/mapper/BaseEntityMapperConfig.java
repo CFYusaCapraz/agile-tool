@@ -5,10 +5,11 @@ import com.cfyusacapraz.agiletool.dto.base.BaseEntityDto;
 import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import org.mapstruct.Context;
 import org.mapstruct.MapperConfig;
+import org.mapstruct.MappingConstants;
 
 import java.io.Serializable;
 
-@MapperConfig(uses = {AuditMetadataMapper.class})
+@MapperConfig(componentModel = MappingConstants.ComponentModel.SPRING, uses = {AuditMetadataMapper.class})
 public interface BaseEntityMapperConfig<D extends BaseEntityDto<ID>, ID extends Serializable> {
 
     BaseEntityDto<ID> toDto(BaseEntity<ID, D> entity, @Context CycleAvoidingMappingContext context);
