@@ -9,6 +9,7 @@ import com.cfyusacapraz.agiletool.domain.Team_;
 import com.cfyusacapraz.agiletool.domain.User;
 import com.cfyusacapraz.agiletool.domain.enums.Roles;
 import com.cfyusacapraz.agiletool.dto.RetroDto;
+import com.cfyusacapraz.agiletool.dto.UserDto;
 import com.cfyusacapraz.agiletool.repository.RetroRepository;
 import com.cfyusacapraz.agiletool.service.AuthenticationService;
 import com.cfyusacapraz.agiletool.service.RetroService;
@@ -16,15 +17,14 @@ import com.cfyusacapraz.agiletool.util.PaginationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.util.Pair;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -37,80 +37,71 @@ public class RetroServiceImpl implements RetroService {
 
     @Override
     @Transactional
-    @Async
-    public CompletableFuture<RetroDto> create(@NotNull RetroCreateRequest retroCreateRequest) {
+    public RetroDto create(@NotNull RetroCreateRequest retroCreateRequest) {
         log.info("Creating retrospective session with title: {}", retroCreateRequest.getTitle());
 
-        return authenticationService.getCurrentUser()
-                .thenApply(userDto -> {
-                    User user = new User().fromDto(userDto);
-                    Retro retro = Retro.builder()
-                            .title(retroCreateRequest.getTitle())
-                            .description(retroCreateRequest.getDescription())
-                            .scheduledDate(retroCreateRequest.getScheduledDate())
-                            .createdBy(user)
-                            .team(user.getTeam())
-                            .build();
+        UserDto currentUser = authenticationService.getCurrentUser();
+        User user = new User().fromDto(currentUser);
+        Retro retro =
+                Retro.builder().title(retroCreateRequest.getTitle()).description(retroCreateRequest.getDescription())
+                        .scheduledDate(retroCreateRequest.getScheduledDate()).createdBy(user).team(user.getTeam())
+                        .build();
 
-                    Retro savedRetro = retroRepository.save(retro);
-                    log.info("Retrospective session created with ID: {}", savedRetro.getId());
-                    return savedRetro;
-                }).thenApply(Retro::toDto);
+        Retro savedRetro = retroRepository.save(retro);
+        log.info("Retrospective session created with ID: {}", savedRetro.getId());
+        return savedRetro.toDto();
+
     }
 
     @Override
     @Transactional(readOnly = true)
-    @Async
-    public CompletableFuture<Pair<List<RetroDto>, PageData>> getAll(@NotNull BasePagedApiRequest basePagedApiRequest) {
-        return authenticationService.getCurrentUser()
-                .thenCompose(userDto -> {
-                    Object teamId;
-                    if (userDto != null && userDto.getTeam() != null) {
-                        teamId = userDto.getTeam().getId();
-                    } else {
-                        teamId = null;
-                    }
+    public Pair<List<RetroDto>, PageData> getAll(@NotNull BasePagedApiRequest basePagedApiRequest) {
+        Specification<Retro> specification = getRetroSpecification();
 
-                    Specification<Retro> specification = (root, query, cb) -> {
-                        if (teamId == null) {
-                            return cb.conjunction();
-                        }
-                        return cb.equal(root.get(Retro_.team).get(Team_.id), teamId);
-                    };
+        Page<Retro> retroPage =
+                PaginationService.getPagedAndFilteredData(retroRepository, basePagedApiRequest.toPaginationData(),
+                        specification);
+        List<RetroDto> retroDtoList = retroPage.map(Retro::toDto).getContent();
+        PageData pageData =
+                new PageData(retroPage.getNumber(), retroPage.getTotalElements(), retroPage.getTotalPages());
+        return Pair.of(retroDtoList, pageData);
 
-                    return PaginationService.getPagedAndFilteredData(retroRepository, basePagedApiRequest.toPaginationData(), specification)
-                            .thenApply(retroPage -> {
-                                List<RetroDto> retroDtoList = retroPage.map(Retro::toDto).getContent();
-                                PageData pageData = new PageData(retroPage.getNumber(), retroPage.getTotalElements(), retroPage.getTotalPages());
-                                return Pair.of(retroDtoList, pageData);
-                            });
-                });
+    }
+
+    private @NotNull Specification<Retro> getRetroSpecification() {
+        UserDto currentUser = authenticationService.getCurrentUser();
+        Object teamId;
+        if (currentUser != null && currentUser.getTeam() != null) {
+            teamId = currentUser.getTeam().getId();
+        } else {
+            teamId = null;
+        }
+
+        return (root, query, cb) -> {
+            if (teamId == null) {
+                return cb.conjunction();
+            }
+            return cb.equal(root.get(Retro_.team).get(Team_.id), teamId);
+        };
     }
 
     @Override
     @Transactional(readOnly = true)
-    @Async
-    public CompletableFuture<RetroDto> getById(@NotNull UUID id) {
-        return authenticationService.getCurrentUser()
-                .thenCompose(userDto -> {
-                    CompletableFuture<Retro> retroCompletableFuture = CompletableFuture.completedFuture(retroRepository.findById(id))
-                            .thenApply(optionalRetro -> optionalRetro.orElseThrow(() ->
-                                    new IllegalArgumentException("Retrospective session not found with ID: " + id)));
+    public RetroDto getById(@NotNull UUID id) {
+        UserDto currentUser = authenticationService.getCurrentUser();
+        Retro retro = retroRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Retrospective session not found with ID: " + id));
+        assert currentUser != null;
 
-                    return retroCompletableFuture.thenApply(retro -> {
-                        assert userDto != null;
-                        boolean isAdmin = userDto.getRole().getName().equalsIgnoreCase(Roles.ROLE_ADMIN.name());
-                        boolean belongsToRetroTeam = userDto.getTeam() != null
-                                && retro.getTeam() != null
-                                && userDto.getTeam().getId() != null
-                                && userDto.getTeam().getId().equals(retro.getTeam().getId());
+        boolean isAdmin = currentUser.getRole().getName().equalsIgnoreCase(Roles.ROLE_ADMIN.name());
+        boolean belongsToRetroTeam =
+                currentUser.getTeam() != null && retro.getTeam() != null && currentUser.getTeam().getId() != null &&
+                        currentUser.getTeam().getId().equals(retro.getTeam().getId());
 
-                        if (!isAdmin || !belongsToRetroTeam) {
-                            throw new SecurityException("User is not authorized to access this retrospective");
-                        }
+        if (!isAdmin || !belongsToRetroTeam) {
+            throw new SecurityException("User is not authorized to access this retrospective");
+        }
 
-                        return retro.toDto();
-                    });
-                });
+        return retro.toDto();
     }
 }
