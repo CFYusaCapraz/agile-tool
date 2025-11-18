@@ -17,9 +17,4 @@ public class PagedListResultResponse<D extends List<?>> extends BaseApiResponse 
     private D resultList;
 
     private PageData pageData;
-
-    @Override
-    public boolean isSuccess() {
-        return true;
-    }
 }

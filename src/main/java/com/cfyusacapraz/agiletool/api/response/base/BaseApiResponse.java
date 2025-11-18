@@ -15,7 +15,7 @@ public class BaseApiResponse implements Serializable {
 
     private long timestamp = System.currentTimeMillis();
 
-    private boolean success;
+    private boolean success = true;
 
     private String correlationId;
 
