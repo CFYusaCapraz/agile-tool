@@ -11,22 +11,21 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 public interface TeamService {
 
     @PreAuthorize("hasRole(ADMIN) or hasAuthority(TEAM_CREATE)")
-    CompletableFuture<TeamDto> create(@NotNull TeamCreateRequest teamCreateRequest);
+    TeamDto create(@NotNull TeamCreateRequest teamCreateRequest);
 
     @PreAuthorize("hasRole(ADMIN) or hasAuthority(TEAM_UPDATE)")
-    CompletableFuture<TeamDto> update(@NotNull UUID id, @NotNull TeamUpdateRequest teamCreateRequest);
+    TeamDto update(@NotNull UUID id, @NotNull TeamUpdateRequest teamCreateRequest);
 
     @PreAuthorize("hasRole(ADMIN) or hasAuthority(TEAM_DELETE)")
-    CompletableFuture<Void> delete(@NotNull UUID id);
+    void delete(@NotNull UUID id);
 
     @PreAuthorize("hasRole(ADMIN) or hasAuthority(TEAM_READ)")
-    CompletableFuture<TeamDto> getById(@NotNull UUID id);
+    TeamDto getById(@NotNull UUID id);
 
     @PreAuthorize("hasRole(ADMIN) or hasAuthority(TEAM_READ)")
-    CompletableFuture<Pair<List<TeamDto>, PageData>> getAll(@NotNull TeamFilterRequest teamFilterRequest);
+    Pair<List<TeamDto>, PageData> getAll(@NotNull TeamFilterRequest teamFilterRequest);
 }

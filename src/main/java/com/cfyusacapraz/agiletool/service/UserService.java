@@ -11,25 +11,24 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 public interface UserService {
 
     @PreAuthorize(value = "hasRole('ADMIN')")
-    CompletableFuture<UserDto> create(@NotNull UserCreateRequest userCreateRequest);
+    UserDto create(@NotNull UserCreateRequest userCreateRequest);
 
     @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == #id")
-    CompletableFuture<UserDto> update(@NotNull UUID id, @NotNull UserUpdateRequest userUpdateRequest);
+    UserDto update(@NotNull UUID id, @NotNull UserUpdateRequest userUpdateRequest);
 
     @PreAuthorize("hasRole('ADMIN')")
-    CompletableFuture<Void> delete(@NotNull UUID id);
+    void delete(@NotNull UUID id);
 
     @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == #id")
-    CompletableFuture<UserDto> getById(@NotNull UUID id);
+    UserDto getById(@NotNull UUID id);
 
     @PreAuthorize("hasRole('ADMIN')")
-    CompletableFuture<Pair<List<UserDto>, PageData>> getAll(@NotNull UserFilterRequest userFilterRequest);
+    Pair<List<UserDto>, PageData> getAll(@NotNull UserFilterRequest userFilterRequest);
 
     @PreAuthorize("hasRole('ADMIN') or authentication.principal.email == #email")
-    CompletableFuture<UserDto> getByEmail(@NotNull String email);
+    UserDto getByEmail(@NotNull String email);
 }
