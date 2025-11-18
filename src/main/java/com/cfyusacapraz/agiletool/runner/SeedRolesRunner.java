@@ -23,14 +23,13 @@ public class SeedRolesRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         log.trace("Seeding roles.");
-        Arrays.stream(Roles.values()).parallel()
-                .forEach(roleEnum -> {
-                    String roleName = roleEnum.name();
-                    roleRepository.findByName(roleName).join().orElseGet(() -> {
-                        log.trace("Seeding role: {}", roleName);
-                        return roleRepository.save(Role.builder().name(roleName).build());
-                    });
-                });
+        Arrays.stream(Roles.values()).parallel().forEach(roleEnum -> {
+            String roleName = roleEnum.name();
+            roleRepository.findByName(roleName).orElseGet(() -> {
+                log.trace("Seeding role: {}", roleName);
+                return roleRepository.save(Role.builder().name(roleName).build());
+            });
+        });
         log.trace("Finished seeding roles.");
     }
 }

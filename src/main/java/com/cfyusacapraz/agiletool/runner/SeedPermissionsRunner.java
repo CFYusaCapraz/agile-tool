@@ -23,17 +23,13 @@ public class SeedPermissionsRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         log.trace("Seeding permissions.");
-        Arrays.stream(Permissions.values()).parallel()
-                .forEach(permissionEnum -> {
-                    String permissionName = permissionEnum.name();
-                    permissionRepository.findByName(permissionName).join().orElseGet(() -> {
-                        log.trace("Seeding permission: {}", permissionName);
-                        return permissionRepository.save(
-                                Permission.builder()
-                                        .name(permissionName)
-                                        .build());
-                    });
-                });
+        Arrays.stream(Permissions.values()).parallel().forEach(permissionEnum -> {
+            String permissionName = permissionEnum.name();
+            permissionRepository.findByName(permissionName).orElseGet(() -> {
+                log.trace("Seeding permission: {}", permissionName);
+                return permissionRepository.save(Permission.builder().name(permissionName).build());
+            });
+        });
         log.trace("Finished seeding permissions.");
     }
 }
