@@ -47,7 +47,7 @@ public class SeedAdminRunner implements ApplicationRunner {
 
         try {
             RoleDto roleDto = roleService.getByName(Roles.ROLE_ADMIN.name()).join();
-            log.info("Role with name {} found", roleDto.getName());
+            log.trace("Role with name {} found", roleDto.getName());
             role = new Role().fromDto(roleDto);
         } catch (Exception exception) {
             log.error("Role with name {} not found", Roles.ROLE_ADMIN.name(), exception);
@@ -81,7 +81,7 @@ public class SeedAdminRunner implements ApplicationRunner {
 
         try {
             userService.create(userCreateRequest).join();
-            log.info("Seeded default admin user: {}", email);
+            log.trace("Seeded default admin user: {}", email);
         } catch (Exception e) {
             log.error("Failed to seed default admin user: {}", email, e);
         } finally {
