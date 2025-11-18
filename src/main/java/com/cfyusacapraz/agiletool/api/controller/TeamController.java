@@ -5,18 +5,16 @@ import com.cfyusacapraz.agiletool.api.request.TeamCreateRequest;
 import com.cfyusacapraz.agiletool.api.request.TeamFilterRequest;
 import com.cfyusacapraz.agiletool.api.request.TeamUpdateRequest;
 import com.cfyusacapraz.agiletool.api.response.TeamResponse;
-import com.cfyusacapraz.agiletool.api.response.base.BaseApiResponse;
-import com.cfyusacapraz.agiletool.api.response.base.PagedListResultResponse;
-import com.cfyusacapraz.agiletool.api.response.base.SaveEntityResponse;
-import com.cfyusacapraz.agiletool.api.response.base.SingleResultResponse;
+import com.cfyusacapraz.agiletool.api.response.base.*;
+import com.cfyusacapraz.agiletool.dto.TeamDto;
 import com.cfyusacapraz.agiletool.service.TeamService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.util.Pair;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping(path = ApiEndpoints.TEAM_BASE_URL, produces = ApiEndpoints.RESPONSE_CONTENT_TYPE)
@@ -27,39 +25,34 @@ public class TeamController {
     private final TeamService teamService;
 
     @PostMapping
-    public CompletableFuture<SaveEntityResponse<UUID>> createTeam(
-            @Validated @RequestBody TeamCreateRequest teamCreateRequest) {
-        return teamService.create(teamCreateRequest)
-                .thenApply(SaveEntityResponse::new);
+    public SaveEntityResponse<UUID> createTeam(@Validated @RequestBody TeamCreateRequest teamCreateRequest) {
+        TeamDto teamDto = teamService.create(teamCreateRequest);
+        return new SaveEntityResponse<>(teamDto);
     }
 
     @PutMapping(path = "/{teamId}")
-    public CompletableFuture<SaveEntityResponse<UUID>> updateTeam(@PathVariable("teamId") UUID id,
-                                                                  @Validated @RequestBody
-                                                                  TeamUpdateRequest teamCreateRequest) {
-        return teamService.update(id, teamCreateRequest)
-                .thenApply(SaveEntityResponse::new);
+    public SaveEntityResponse<UUID> updateTeam(@PathVariable("teamId") UUID id,
+                                               @Validated @RequestBody TeamUpdateRequest teamCreateRequest) {
+        TeamDto teamDto = teamService.update(id, teamCreateRequest);
+        return new SaveEntityResponse<>(teamDto);
     }
 
     @DeleteMapping(path = "/{teamId}")
-    public CompletableFuture<BaseApiResponse> deleteTeam(@PathVariable("teamId") UUID id) {
-        return teamService.delete(id)
-                .thenApply(voidResult -> new BaseApiResponse(null, true));
+    public BaseApiResponse deleteTeam(@PathVariable("teamId") UUID id) {
+        teamService.delete(id);
+        return new BaseApiResponse(null, true);
     }
 
     @GetMapping(path = "/{teamId}")
-    public CompletableFuture<SingleResultResponse<TeamResponse>> getTeam(@PathVariable("teamId") UUID id) {
-        return teamService.getById(id)
-                .thenApply(teamDto -> new SingleResultResponse<>(new TeamResponse(teamDto)));
+    public SingleResultResponse<TeamResponse> getTeam(@PathVariable("teamId") UUID id) {
+        TeamDto teamDto = teamService.getById(id);
+        return new SingleResultResponse<>(new TeamResponse(teamDto));
     }
 
     @GetMapping
-    public CompletableFuture<PagedListResultResponse<List<TeamResponse>>> getAllTeams(
-            @Validated TeamFilterRequest teamFilterRequest) {
-        return teamService.getAll(teamFilterRequest)
-                .thenApply(pair -> {
-                    List<TeamResponse> teamResponses = pair.getFirst().stream().map(TeamResponse::new).toList();
-                    return new PagedListResultResponse<>(teamResponses, pair.getSecond());
-                });
+    public PagedListResultResponse<List<TeamResponse>> getAllTeams(@Validated TeamFilterRequest teamFilterRequest) {
+        Pair<List<TeamDto>, PageData> dataPair = teamService.getAll(teamFilterRequest);
+        List<TeamResponse> teamResponses = dataPair.getFirst().stream().map(TeamResponse::new).toList();
+        return new PagedListResultResponse<>(teamResponses, dataPair.getSecond());
     }
 }
