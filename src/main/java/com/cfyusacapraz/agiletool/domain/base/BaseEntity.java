@@ -2,8 +2,11 @@ package com.cfyusacapraz.agiletool.domain.base;
 
 import com.cfyusacapraz.agiletool.dto.base.BaseEntityDto;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
@@ -18,6 +21,9 @@ import java.util.Objects;
 @MappedSuperclass
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
 public abstract class BaseEntity<ID extends Serializable, D extends BaseEntityDto<ID>> implements Serializable {
 
     @Id

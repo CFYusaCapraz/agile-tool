@@ -7,19 +7,20 @@ import com.cfyusacapraz.agiletool.mapper.RetroMapper;
 import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
 @Entity
 @Table(name = "retros")
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
 public class Retro extends BaseEntity<UUID, RetroDto> {
 
     @Column(nullable = false)
@@ -50,11 +51,8 @@ public class Retro extends BaseEntity<UUID, RetroDto> {
     private Set<RetroColumn> columns = new HashSet<>();
 
     @ManyToMany
-    @JoinTable(
-            name = "retro_participants",
-            joinColumns = @JoinColumn(name = "retro_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
+    @JoinTable(name = "retro_participants", joinColumns = @JoinColumn(name = "retro_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
     @Builder.Default
     private Set<User> participants = new HashSet<>();
 

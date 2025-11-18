@@ -9,13 +9,14 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(config = BaseEntityMapperConfig.class, unmappedTargetPolicy = ReportingPolicy.ERROR, uses = {UserMapper.class, RetroColumnMapper.class})
+@Mapper(config = BaseEntityMapperConfig.class, unmappedTargetPolicy = ReportingPolicy.ERROR,
+        uses = {UserMapper.class, RetroColumnMapper.class})
 public interface RetroItemMapper {
 
     RetroItemMapper INSTANCE = Mappers.getMapper(RetroItemMapper.class);
 
     RetroItemDto toDto(RetroItem retroItem, @Context CycleAvoidingMappingContext context);
 
-    @Mapping(target = "fromDto", ignore = true)
+    @Mapping(target = "isVisible", source = "visible")
     RetroItem toEntity(RetroItemDto retroItemDto, @Context CycleAvoidingMappingContext context);
 }

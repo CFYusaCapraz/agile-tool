@@ -5,7 +5,11 @@ import com.cfyusacapraz.agiletool.dto.RolePermissionDto;
 import com.cfyusacapraz.agiletool.mapper.RolePermissionMapper;
 import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
@@ -13,7 +17,7 @@ import lombok.*;
 @Table(name = "role_permissions")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class RolePermission extends BaseEntity<Long, RolePermissionDto> {
 
     @ManyToOne(fetch = FetchType.LAZY)

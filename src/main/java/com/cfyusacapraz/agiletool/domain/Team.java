@@ -7,6 +7,7 @@ import com.cfyusacapraz.agiletool.mapper.TeamMapper;
 import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,7 +19,7 @@ import java.util.UUID;
 @Table(name = "teams")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class Team extends BaseEntity<UUID, TeamDto> {
 
     @Column(nullable = false)

@@ -5,7 +5,11 @@ import com.cfyusacapraz.agiletool.dto.UserDto;
 import com.cfyusacapraz.agiletool.mapper.UserMapper;
 import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,7 +25,7 @@ import java.util.stream.Collectors;
 @Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class User extends BaseEntity<UUID, UserDto> implements UserDetails {
 
     @Column(nullable = false, unique = true)
@@ -42,10 +46,8 @@ public class User extends BaseEntity<UUID, UserDto> implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Set<GrantedAuthority> authorities =
-                role.getRolePermissions().stream().map(RolePermission::getPermission)
-                        .map(permission -> new SimpleGrantedAuthority(permission.getName()))
-                        .collect(Collectors.toSet());
+        Set<GrantedAuthority> authorities = role.getRolePermissions().stream().map(RolePermission::getPermission)
+                .map(permission -> new SimpleGrantedAuthority(permission.getName())).collect(Collectors.toSet());
 
         authorities.add(new SimpleGrantedAuthority(role.getName()));
 

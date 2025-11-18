@@ -9,13 +9,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
 @Entity
 @Table(name = "retro_items")
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
 public class RetroItem extends BaseEntity<Long, RetroItemDto> {
 
     @ManyToOne(fetch = FetchType.LAZY)

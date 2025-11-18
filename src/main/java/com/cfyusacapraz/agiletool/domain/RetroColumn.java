@@ -9,16 +9,18 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
 @Entity
 @Table(name = "retro_columns")
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
 public class RetroColumn extends BaseEntity<Long, RetroColumnDto> {
 
     @ManyToOne(fetch = FetchType.LAZY)
