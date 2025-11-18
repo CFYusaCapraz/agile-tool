@@ -17,14 +17,14 @@ import org.springframework.data.jpa.domain.Specification;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public class PaginationService {
 
     public static @NotNull Pageable createPageable(@NotNull PaginationData paginationData) {
         List<Sort.Order> orders = new ArrayList<>();
         paginationData.getSortRules().forEach(sortRule -> {
-            Sort.Order order = sortRule.contains("-") ? Sort.Order.desc(sortRule.substring(0, sortRule.length() - 1)) : Sort.Order.asc(sortRule);
+            Sort.Order order = sortRule.contains("-") ? Sort.Order.desc(sortRule.substring(0, sortRule.length() - 1)) :
+                    Sort.Order.asc(sortRule);
             orders.add(order);
         });
         Sort sort = Sort.by(orders);
@@ -32,24 +32,28 @@ public class PaginationService {
     }
 
     public static <E extends BaseEntity<ID, D>, D extends BaseEntityDto<ID>, R extends BaseEntityRepository<E, D, ID>, ID extends Serializable>
-    @NotNull CompletableFuture<Page<E>> getPagedData(@NotNull BaseEntityRepository<E, D, ID> repository, @NotNull PaginationData paginationData) {
+    @NotNull Page<E> getPagedData(@NotNull BaseEntityRepository<E, D, ID> repository,
+                                  @NotNull PaginationData paginationData) {
         Pageable pageable = createPageable(paginationData);
-        return CompletableFuture.completedFuture(repository.findAll(pageable));
+        return repository.findAll(pageable);
     }
 
     public static <E extends BaseEntity<ID, D>, D extends BaseEntityDto<ID>, R extends BaseEntityRepository<E, D, ID>, ID extends Serializable>
-    @NotNull CompletableFuture<Page<E>> getPagedAndFilteredData(@NotNull BaseEntityRepository<E, D, ID> repository, @NotNull PaginationData paginationData,
-                                                                @NotNull Specification<E> specification) {
+    @NotNull Page<E> getPagedAndFilteredData(@NotNull BaseEntityRepository<E, D, ID> repository,
+                                             @NotNull PaginationData paginationData,
+                                             @NotNull Specification<E> specification) {
         Pageable pageable = createPageable(paginationData);
-        return CompletableFuture.completedFuture(repository.findAll(specification, pageable));
+        return repository.findAll(specification, pageable);
     }
 
     @SneakyThrows
     public static <E extends BaseEntity<ID, D>, D extends BaseEntityDto<ID>, R extends BaseEntityRepository<E, D, ID>, ID extends Serializable, Q extends BasePagedApiRequest, S extends BaseEntitySpecification<E, Q>>
-    @NotNull CompletableFuture<Page<E>> getPagedAndFilteredData(@NotNull BaseEntityRepository<E, D, ID> repository, @NotNull Q filterRequest, Class<S> specificationClass) {
+    @NotNull Page<E> getPagedAndFilteredData(@NotNull BaseEntityRepository<E, D, ID> repository,
+                                             @NotNull Q filterRequest, Class<S> specificationClass) {
         Pageable pageable = createPageable(filterRequest.toPaginationData());
-        S specificationInstance = specificationClass.getDeclaredConstructor(filterRequest.getClass()).newInstance(filterRequest);
+        S specificationInstance =
+                specificationClass.getDeclaredConstructor(filterRequest.getClass()).newInstance(filterRequest);
         Specification<E> specification = specificationInstance.toSpecification();
-        return CompletableFuture.completedFuture(repository.findAll(specification, pageable));
+        return repository.findAll(specification, pageable);
     }
 }
