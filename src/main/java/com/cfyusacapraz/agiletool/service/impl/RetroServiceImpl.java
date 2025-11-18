@@ -56,7 +56,7 @@ public class RetroServiceImpl implements RetroService {
     @Override
     @Transactional(readOnly = true)
     public Pair<List<RetroDto>, PageData> getAll(@NotNull BasePagedApiRequest basePagedApiRequest) {
-        Specification<Retro> specification = getRetroSpecification();
+        Specification<Retro> specification = buildTeamScopedRetroSpecification();
 
         Page<Retro> retroPage =
                 PaginationService.getPagedAndFilteredData(retroRepository, basePagedApiRequest.toPaginationData(),
@@ -68,7 +68,7 @@ public class RetroServiceImpl implements RetroService {
 
     }
 
-    private @NotNull Specification<Retro> getRetroSpecification() {
+    private @NotNull Specification<Retro> buildTeamScopedRetroSpecification() {
         UserDto currentUser = authenticationService.getCurrentUser();
         Object teamId;
         if (currentUser != null && currentUser.getTeam() != null) {
