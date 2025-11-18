@@ -18,6 +18,7 @@ public class SaveEntityResponse<ID extends Serializable> extends BaseApiResponse
     private ID entityId;
 
     public SaveEntityResponse(@NotNull BaseEntityDto<ID> entityDto) {
+        setSuccess(true);
         this.entityId = entityDto.getId();
     }
 
