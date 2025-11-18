@@ -8,6 +8,9 @@ import com.cfyusacapraz.agiletool.domain.Team;
 import com.cfyusacapraz.agiletool.domain.User;
 import com.cfyusacapraz.agiletool.domain.enums.TeamStatus;
 import com.cfyusacapraz.agiletool.dto.TeamDto;
+import com.cfyusacapraz.agiletool.mapper.TeamMapper;
+import com.cfyusacapraz.agiletool.mapper.UserMapper;
+import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import com.cfyusacapraz.agiletool.repository.TeamRepository;
 import com.cfyusacapraz.agiletool.repository.spec.TeamSpecification;
 import com.cfyusacapraz.agiletool.service.TeamService;
@@ -33,12 +36,17 @@ public class TeamServiceImpl implements TeamService {
 
     private final UserService userService;
 
+    private final UserMapper userMapper;
+
+    private final TeamMapper teamMapper;
+
     @Override
     @Transactional
     public TeamDto create(@NotNull TeamCreateRequest teamCreateRequest) {
         log.info("Creating team with name: {}", teamCreateRequest.getName());
 
-        User scrumMaster = new User().fromDto(userService.getById(teamCreateRequest.getScrumMaster()));
+        User scrumMaster = userMapper.toEntity(userService.getById(teamCreateRequest.getScrumMaster()),
+                new CycleAvoidingMappingContext());
 
         teamRepository.findByName(teamCreateRequest.getName()).orElseThrow(() -> new IllegalArgumentException(
                 "Team with name " + teamCreateRequest.getName() + " already exists"));
@@ -47,7 +55,7 @@ public class TeamServiceImpl implements TeamService {
                 .build();
         Team savedTeam = teamRepository.save(team);
         log.info("Team created successfully with id: {}", savedTeam.getId());
-        return savedTeam.toDto();
+        return teamMapper.toDto(savedTeam, new CycleAvoidingMappingContext());
     }
 
     @Override
@@ -60,7 +68,7 @@ public class TeamServiceImpl implements TeamService {
         team.setStatus(teamUpdateRequest.getStatus());
         Team updatedTeam = teamRepository.save(team);
         log.info("Team updated successfully with id: {}", updatedTeam.getId());
-        return updatedTeam.toDto();
+        return teamMapper.toDto(updatedTeam, new CycleAvoidingMappingContext());
     }
 
     @Override
@@ -76,8 +84,9 @@ public class TeamServiceImpl implements TeamService {
     @Override
     @Transactional(readOnly = true)
     public TeamDto getById(@NotNull UUID id) {
-        return teamRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Team with id " + id + " " + "not found")).toDto();
+        return teamMapper.toDto(teamRepository.findById(id)
+                        .orElseThrow(() -> new IllegalArgumentException("Team with id " + id + " " + "not found")),
+                new CycleAvoidingMappingContext());
     }
 
     @Override
@@ -86,7 +95,8 @@ public class TeamServiceImpl implements TeamService {
         TeamSpecification teamSpecification = new TeamSpecification(teamFilterRequest);
         Page<Team> teamPage =
                 PaginationService.getPagedAndFilteredData(teamRepository, teamFilterRequest, TeamSpecification.class);
-        List<TeamDto> teamDtoList = teamPage.stream().map(Team::toDto).toList();
+        List<TeamDto> teamDtoList =
+                teamPage.stream().map(team -> teamMapper.toDto(team, new CycleAvoidingMappingContext())).toList();
         PageData pageData =
                 new PageData(teamFilterRequest.getPageNumber(), teamPage.getTotalElements(), teamPage.getTotalPages());
         return Pair.of(teamDtoList, pageData);

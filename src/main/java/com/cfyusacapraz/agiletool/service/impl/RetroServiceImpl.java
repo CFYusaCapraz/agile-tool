@@ -10,6 +10,9 @@ import com.cfyusacapraz.agiletool.domain.User;
 import com.cfyusacapraz.agiletool.domain.enums.Roles;
 import com.cfyusacapraz.agiletool.dto.RetroDto;
 import com.cfyusacapraz.agiletool.dto.UserDto;
+import com.cfyusacapraz.agiletool.mapper.RetroMapper;
+import com.cfyusacapraz.agiletool.mapper.UserMapper;
+import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import com.cfyusacapraz.agiletool.repository.RetroRepository;
 import com.cfyusacapraz.agiletool.service.AuthenticationService;
 import com.cfyusacapraz.agiletool.service.RetroService;
@@ -35,13 +38,17 @@ public class RetroServiceImpl implements RetroService {
 
     private final AuthenticationService authenticationService;
 
+    private final UserMapper userMapper;
+
+    private final RetroMapper retroMapper;
+
     @Override
     @Transactional
     public RetroDto create(@NotNull RetroCreateRequest retroCreateRequest) {
         log.info("Creating retrospective session with title: {}", retroCreateRequest.getTitle());
 
         UserDto currentUser = authenticationService.getCurrentUser();
-        User user = new User().fromDto(currentUser);
+        User user = userMapper.toEntity(currentUser, new CycleAvoidingMappingContext());
         Retro retro =
                 Retro.builder().title(retroCreateRequest.getTitle()).description(retroCreateRequest.getDescription())
                         .scheduledDate(retroCreateRequest.getScheduledDate()).createdBy(user).team(user.getTeam())
@@ -49,7 +56,7 @@ public class RetroServiceImpl implements RetroService {
 
         Retro savedRetro = retroRepository.save(retro);
         log.info("Retrospective session created with ID: {}", savedRetro.getId());
-        return savedRetro.toDto();
+        return retroMapper.toDto(savedRetro, new CycleAvoidingMappingContext());
 
     }
 
@@ -61,7 +68,8 @@ public class RetroServiceImpl implements RetroService {
         Page<Retro> retroPage =
                 PaginationService.getPagedAndFilteredData(retroRepository, basePagedApiRequest.toPaginationData(),
                         specification);
-        List<RetroDto> retroDtoList = retroPage.map(Retro::toDto).getContent();
+        List<RetroDto> retroDtoList =
+                retroPage.map(retro -> retroMapper.toDto(retro, new CycleAvoidingMappingContext())).getContent();
         PageData pageData =
                 new PageData(retroPage.getNumber(), retroPage.getTotalElements(), retroPage.getTotalPages());
         return Pair.of(retroDtoList, pageData);
@@ -102,6 +110,6 @@ public class RetroServiceImpl implements RetroService {
             throw new SecurityException("User is not authorized to access this retrospective");
         }
 
-        return retro.toDto();
+        return retroMapper.toDto(retro, new CycleAvoidingMappingContext());
     }
 }

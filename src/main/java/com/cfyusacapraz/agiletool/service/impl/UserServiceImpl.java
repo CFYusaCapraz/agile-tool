@@ -4,10 +4,12 @@ import com.cfyusacapraz.agiletool.api.request.UserCreateRequest;
 import com.cfyusacapraz.agiletool.api.request.UserFilterRequest;
 import com.cfyusacapraz.agiletool.api.request.UserUpdateRequest;
 import com.cfyusacapraz.agiletool.api.response.base.PageData;
-import com.cfyusacapraz.agiletool.domain.Role;
 import com.cfyusacapraz.agiletool.domain.User;
 import com.cfyusacapraz.agiletool.dto.RoleDto;
 import com.cfyusacapraz.agiletool.dto.UserDto;
+import com.cfyusacapraz.agiletool.mapper.RoleMapper;
+import com.cfyusacapraz.agiletool.mapper.UserMapper;
+import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import com.cfyusacapraz.agiletool.repository.UserRepository;
 import com.cfyusacapraz.agiletool.repository.spec.UserSpecification;
 import com.cfyusacapraz.agiletool.service.RoleService;
@@ -39,6 +41,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final RoleService roleService;
 
+    private final RoleMapper roleMapper;
+
+    private final UserMapper userMapper;
+
     @Override
     @Transactional
     public UserDto create(@NotNull UserCreateRequest userCreateRequest) {
@@ -52,11 +58,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         User user = User.builder().email(userCreateRequest.getEmail())
                 .password(passwordEncoder.encode(userCreateRequest.getPassword())).name(userCreateRequest.getName())
-                .role(new Role().fromDto(roleDto)).build();
+                .role(roleMapper.toEntity(roleDto, new CycleAvoidingMappingContext())).build();
         User savedUser = userRepository.save(user);
 
         log.info("User created successfully with id: {}", user.getId());
-        return savedUser.toDto();
+        return userMapper.toDto(savedUser, new CycleAvoidingMappingContext());
 
     }
 
@@ -71,12 +77,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         user.setEmail(userUpdateRequest.getEmail());
         user.setName(userUpdateRequest.getName());
-        user.setRole(new Role().fromDto(roleDto));
+        user.setRole(roleMapper.toEntity(roleDto, new CycleAvoidingMappingContext()));
 
         User updatedUser = userRepository.save(user);
 
         log.info("User updated successfully with id: {}", user.getId());
-        return updatedUser.toDto();
+        return userMapper.toDto(updatedUser, new CycleAvoidingMappingContext());
     }
 
     @Override
@@ -93,7 +99,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDto getById(@NotNull UUID id) {
-        return getUserEntityById(id).toDto();
+        return userMapper.toDto(getUserEntityById(id), new CycleAvoidingMappingContext());
     }
 
     @Override
@@ -101,7 +107,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public Pair<List<UserDto>, PageData> getAll(@NotNull UserFilterRequest userFilterRequest) {
         Page<User> userPage =
                 PaginationService.getPagedAndFilteredData(userRepository, userFilterRequest, UserSpecification.class);
-        List<UserDto> userDtoList = userPage.stream().map(User::toDto).toList();
+        List<UserDto> userDtoList =
+                userPage.stream().map(user -> userMapper.toDto(user, new CycleAvoidingMappingContext())).toList();
         PageData pageData =
                 new PageData(userFilterRequest.getPageNumber(), userPage.getTotalElements(), userPage.getTotalPages());
         return Pair.of(userDtoList, pageData);
@@ -110,8 +117,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDto getByEmail(@NotNull String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User with email " + email + " not found")).toDto();
+        return userMapper.toDto(userRepository.findByEmail(email)
+                        .orElseThrow(() -> new IllegalArgumentException("User with email " + email + " not found")),
+                new CycleAvoidingMappingContext());
     }
 
     @Override

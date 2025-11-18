@@ -5,6 +5,8 @@ import com.cfyusacapraz.agiletool.api.request.RefreshTokenRequest;
 import com.cfyusacapraz.agiletool.api.response.AuthenticationResponse;
 import com.cfyusacapraz.agiletool.domain.User;
 import com.cfyusacapraz.agiletool.dto.UserDto;
+import com.cfyusacapraz.agiletool.mapper.UserMapper;
+import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import com.cfyusacapraz.agiletool.repository.UserRepository;
 import com.cfyusacapraz.agiletool.service.AuthenticationService;
 import com.cfyusacapraz.agiletool.util.JwtService;
@@ -27,23 +29,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final AuthenticationManager authenticationManager;
 
+    private final UserMapper userMapper;
+
     @Override
     @Transactional(readOnly = true)
     public AuthenticationResponse authenticate(@NotNull AuthenticationRequest request) {
         String email = request.getEmail();
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        email,
-                        request.getPassword()
-                )
-        );
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, request.getPassword()));
         User user = getUserEntityByEmail(email);
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
-        return AuthenticationResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+        return AuthenticationResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
     }
 
     @Override
@@ -54,10 +50,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (jwtService.isTokenValid(request.getToken(), user)) {
             String accessToken = jwtService.generateToken(user);
             String refreshToken = jwtService.generateRefreshToken(user);
-            return AuthenticationResponse.builder()
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .build();
+            return AuthenticationResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
         }
         throw new IllegalArgumentException("Invalid refresh token");
     }
@@ -71,12 +64,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         Object principal = authentication.getPrincipal();
         if (principal instanceof User user) {
-            return user.toDto();
+            return userMapper.toDto(user, new CycleAvoidingMappingContext());
         }
 
         String email = authentication.getName();
-        return getUserEntityByEmail(email)
-                .toDto();
+        return userMapper.toDto(getUserEntityByEmail(email), new CycleAvoidingMappingContext());
     }
 
     private User getUserEntityByEmail(String email) {
