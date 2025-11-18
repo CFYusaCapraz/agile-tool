@@ -5,6 +5,7 @@ import com.cfyusacapraz.agiletool.api.request.TeamFilterRequest;
 import com.cfyusacapraz.agiletool.api.request.TeamUpdateRequest;
 import com.cfyusacapraz.agiletool.api.response.base.PageData;
 import com.cfyusacapraz.agiletool.domain.Team;
+import com.cfyusacapraz.agiletool.domain.User;
 import com.cfyusacapraz.agiletool.domain.enums.TeamStatus;
 import com.cfyusacapraz.agiletool.dto.TeamDto;
 import com.cfyusacapraz.agiletool.repository.TeamRepository;
@@ -15,14 +16,13 @@ import com.cfyusacapraz.agiletool.util.PaginationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
 import org.springframework.data.util.Pair;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -35,80 +35,60 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @Transactional
-    @Async
-    public CompletableFuture<TeamDto> create(@NotNull TeamCreateRequest teamCreateRequest) {
+    public TeamDto create(@NotNull TeamCreateRequest teamCreateRequest) {
         log.info("Creating team with name: {}", teamCreateRequest.getName());
 
-        teamRepository.findByName(teamCreateRequest.getName())
-                .thenAccept(optionalTeam -> optionalTeam.ifPresent(team -> {
-                    throw new IllegalArgumentException("Team with name " + teamCreateRequest.getName() + " already exists");
-                })).join();
+        User scrumMaster = new User().fromDto(userService.getById(teamCreateRequest.getScrumMaster()));
 
-        return userService.getById(teamCreateRequest.getScrumMaster())
-                .thenApply(userDto -> Team.builder().build())
-                .thenApply(team -> {
-                    Team savedTeam = teamRepository.save(team);
-                    log.info("Team created successfully with id: {}", savedTeam.getId());
-                    return savedTeam;
-                }).thenApply(Team::toDto);
+        teamRepository.findByName(teamCreateRequest.getName()).orElseThrow(() -> new IllegalArgumentException(
+                "Team with name " + teamCreateRequest.getName() + " already exists"));
+
+        Team team = Team.builder().name(teamCreateRequest.getName()).scrumMaster(scrumMaster).status(TeamStatus.ACTIVE)
+                .build();
+        Team savedTeam = teamRepository.save(team);
+        log.info("Team created successfully with id: {}", savedTeam.getId());
+        return savedTeam.toDto();
     }
 
     @Override
     @Transactional
-    @Async
-    public CompletableFuture<TeamDto> update(@NotNull UUID id, @NotNull TeamUpdateRequest teamUpdateRequest) {
+    public TeamDto update(@NotNull UUID id, @NotNull TeamUpdateRequest teamUpdateRequest) {
         log.info("Updating team with id: {}", id);
-
-        return CompletableFuture.completedFuture(teamRepository.findById(id))
-                .thenApply(optionalTeam -> optionalTeam.orElseThrow(() ->
-                        new IllegalArgumentException("Team with id " + id + " not found")))
-                .thenApply(team -> {
-                    team.setName(teamUpdateRequest.getName());
-                    team.setStatus(teamUpdateRequest.getStatus());
-
-                    Team updatedTeam = teamRepository.save(team);
-                    log.info("Team updated successfully with id: {}", updatedTeam.getId());
-                    return updatedTeam;
-                })
-                .thenApply(Team::toDto);
+        Team team = teamRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Team with id " + id + " not found"));
+        team.setName(teamUpdateRequest.getName());
+        team.setStatus(teamUpdateRequest.getStatus());
+        Team updatedTeam = teamRepository.save(team);
+        log.info("Team updated successfully with id: {}", updatedTeam.getId());
+        return updatedTeam.toDto();
     }
 
     @Override
     @Transactional
-    @Async
-    public CompletableFuture<Void> delete(@NotNull UUID id) {
-        return CompletableFuture.completedFuture(teamRepository.findById(id))
-                .thenApply(optionalTeam -> optionalTeam.orElseThrow(() ->
-                        new IllegalArgumentException("Team with id " + id + " not found")))
-                .thenAccept(team -> {
-                    team.setStatus(TeamStatus.ARCHIVED);
-                    teamRepository.save(team);
-                    log.info("Team deleted successfully with id: {}", id);
-                });
+    public void delete(@NotNull UUID id) {
+        Team team = teamRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Team with id " + id + " not found"));
+        team.setStatus(TeamStatus.ARCHIVED);
+        teamRepository.save(team);
+        log.info("Team deleted successfully with id: {}", id);
     }
 
     @Override
     @Transactional(readOnly = true)
-    @Async
-    public CompletableFuture<TeamDto> getById(@NotNull UUID id) {
-        return CompletableFuture.completedFuture(teamRepository.findById(id))
-                .thenApply(optionalTeam -> optionalTeam.orElseThrow(() ->
-                        new IllegalArgumentException("Team with id " + id + " not found")))
-                .thenApply(Team::toDto);
+    public TeamDto getById(@NotNull UUID id) {
+        return teamRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Team with id " + id + " " + "not found")).toDto();
     }
 
     @Override
     @Transactional(readOnly = true)
-    @Async
-    public CompletableFuture<Pair<List<TeamDto>, PageData>> getAll(@NotNull TeamFilterRequest teamFilterRequest) {
+    public Pair<List<TeamDto>, PageData> getAll(@NotNull TeamFilterRequest teamFilterRequest) {
         TeamSpecification teamSpecification = new TeamSpecification(teamFilterRequest);
-        return PaginationService.getPagedAndFilteredData(teamRepository, teamFilterRequest, TeamSpecification.class)
-                .thenApply(teamPage -> {
-                    List<TeamDto> teamDtoList = teamPage.stream()
-                            .map(Team::toDto)
-                            .toList();
-                    PageData pageData = new PageData(teamFilterRequest.getPageNumber(), teamPage.getTotalElements(), teamPage.getTotalPages());
-                    return Pair.of(teamDtoList, pageData);
-                });
+        Page<Team> teamPage =
+                PaginationService.getPagedAndFilteredData(teamRepository, teamFilterRequest, TeamSpecification.class);
+        List<TeamDto> teamDtoList = teamPage.stream().map(Team::toDto).toList();
+        PageData pageData =
+                new PageData(teamFilterRequest.getPageNumber(), teamPage.getTotalElements(), teamPage.getTotalPages());
+        return Pair.of(teamDtoList, pageData);
     }
 }
