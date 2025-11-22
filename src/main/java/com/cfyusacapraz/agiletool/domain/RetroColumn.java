@@ -3,10 +3,7 @@ package com.cfyusacapraz.agiletool.domain;
 import com.cfyusacapraz.agiletool.domain.base.BaseEntity;
 import com.cfyusacapraz.agiletool.dto.RetroColumnDto;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.HashSet;
@@ -35,5 +32,6 @@ public class RetroColumn extends BaseEntity<Long, RetroColumnDto> {
     private int order;
 
     @OneToMany(mappedBy = "column", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private Set<RetroItem> items = new HashSet<>();
 }

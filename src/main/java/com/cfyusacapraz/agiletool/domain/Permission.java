@@ -6,12 +6,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -28,5 +26,6 @@ public class Permission extends BaseEntity<UUID, PermissionDto> {
     private String name;
 
     @OneToMany(mappedBy = "permission")
-    private Set<RolePermission> rolePermissions;
+    @Builder.Default
+    private Set<RolePermission> rolePermissions = new HashSet<>();
 }
