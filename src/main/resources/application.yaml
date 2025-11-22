@@ -22,7 +22,6 @@ spring:
     url: jdbc:postgresql://localhost:5432/retrospective
     username: postgres
   jpa:
-    generate-ddl: true
     hibernate:
       ddl-auto: validate
     open-in-view: false
