@@ -7,8 +7,8 @@ import com.cfyusacapraz.agiletool.api.response.base.PageData;
 import com.cfyusacapraz.agiletool.domain.User;
 import com.cfyusacapraz.agiletool.dto.RoleDto;
 import com.cfyusacapraz.agiletool.dto.UserDto;
-import com.cfyusacapraz.agiletool.mapper.RoleMapper;
-import com.cfyusacapraz.agiletool.mapper.UserMapper;
+import com.cfyusacapraz.agiletool.mapper.DtoMapper;
+import com.cfyusacapraz.agiletool.mapper.EntityMapper;
 import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import com.cfyusacapraz.agiletool.repository.UserRepository;
 import com.cfyusacapraz.agiletool.repository.spec.UserSpecification;
@@ -41,9 +41,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final RoleService roleService;
 
-    private final RoleMapper roleMapper;
+    private final DtoMapper dtoMapper;
 
-    private final UserMapper userMapper;
+    private final EntityMapper entityMapper;
 
     @Override
     @Transactional
@@ -58,11 +58,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         User user = User.builder().email(userCreateRequest.getEmail())
                 .password(passwordEncoder.encode(userCreateRequest.getPassword())).name(userCreateRequest.getName())
-                .role(roleMapper.toEntity(roleDto, new CycleAvoidingMappingContext())).build();
+                .role(entityMapper.toEntity(roleDto, new CycleAvoidingMappingContext())).build();
         User savedUser = userRepository.save(user);
 
         log.info("User created successfully with id: {}", user.getId());
-        return userMapper.toDto(savedUser, new CycleAvoidingMappingContext());
+        return dtoMapper.toDto(savedUser, new CycleAvoidingMappingContext());
 
     }
 
@@ -77,12 +77,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         user.setEmail(userUpdateRequest.getEmail());
         user.setName(userUpdateRequest.getName());
-        user.setRole(roleMapper.toEntity(roleDto, new CycleAvoidingMappingContext()));
+        user.setRole(entityMapper.toEntity(roleDto, new CycleAvoidingMappingContext()));
 
         User updatedUser = userRepository.save(user);
 
         log.info("User updated successfully with id: {}", user.getId());
-        return userMapper.toDto(updatedUser, new CycleAvoidingMappingContext());
+        return dtoMapper.toDto(updatedUser, new CycleAvoidingMappingContext());
     }
 
     @Override
@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDto getById(@NotNull UUID id) {
-        return userMapper.toDto(getUserEntityById(id), new CycleAvoidingMappingContext());
+        return dtoMapper.toDto(getUserEntityById(id), new CycleAvoidingMappingContext());
     }
 
     @Override
@@ -108,7 +108,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         Page<User> userPage =
                 PaginationService.getPagedAndFilteredData(userRepository, userFilterRequest, UserSpecification.class);
         List<UserDto> userDtoList =
-                userPage.stream().map(user -> userMapper.toDto(user, new CycleAvoidingMappingContext())).toList();
+                userPage.stream().map(user -> dtoMapper.toDto(user, new CycleAvoidingMappingContext())).toList();
         PageData pageData =
                 new PageData(userFilterRequest.getPageNumber(), userPage.getTotalElements(), userPage.getTotalPages());
         return Pair.of(userDtoList, pageData);
@@ -117,7 +117,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDto getByEmail(@NotNull String email) {
-        return userMapper.toDto(userRepository.findByEmail(email)
+        return dtoMapper.toDto(userRepository.findByEmail(email)
                         .orElseThrow(() -> new IllegalArgumentException("User with email " + email + " not found")),
                 new CycleAvoidingMappingContext());
     }

@@ -5,7 +5,7 @@ import com.cfyusacapraz.agiletool.api.request.RefreshTokenRequest;
 import com.cfyusacapraz.agiletool.api.response.AuthenticationResponse;
 import com.cfyusacapraz.agiletool.domain.User;
 import com.cfyusacapraz.agiletool.dto.UserDto;
-import com.cfyusacapraz.agiletool.mapper.UserMapper;
+import com.cfyusacapraz.agiletool.mapper.DtoMapper;
 import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import com.cfyusacapraz.agiletool.repository.UserRepository;
 import com.cfyusacapraz.agiletool.service.AuthenticationService;
@@ -29,7 +29,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final AuthenticationManager authenticationManager;
 
-    private final UserMapper userMapper;
+    private final DtoMapper dtoMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -64,11 +64,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         Object principal = authentication.getPrincipal();
         if (principal instanceof User user) {
-            return userMapper.toDto(user, new CycleAvoidingMappingContext());
+            return dtoMapper.toDto(user, new CycleAvoidingMappingContext());
         }
 
         String email = authentication.getName();
-        return userMapper.toDto(getUserEntityByEmail(email), new CycleAvoidingMappingContext());
+        return dtoMapper.toDto(getUserEntityByEmail(email), new CycleAvoidingMappingContext());
     }
 
     private User getUserEntityByEmail(String email) {

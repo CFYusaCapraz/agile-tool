@@ -5,7 +5,7 @@ import com.cfyusacapraz.agiletool.domain.Role;
 import com.cfyusacapraz.agiletool.domain.enums.Roles;
 import com.cfyusacapraz.agiletool.dto.RoleDto;
 import com.cfyusacapraz.agiletool.dto.UserDto;
-import com.cfyusacapraz.agiletool.mapper.RoleMapper;
+import com.cfyusacapraz.agiletool.mapper.EntityMapper;
 import com.cfyusacapraz.agiletool.mapper.util.CycleAvoidingMappingContext;
 import com.cfyusacapraz.agiletool.properties.SeedAdminProperties;
 import com.cfyusacapraz.agiletool.service.RoleService;
@@ -37,7 +37,7 @@ public class SeedAdminRunner implements ApplicationRunner {
 
     private final SeedAdminProperties seedAdminProperties;
 
-    private final RoleMapper roleMapper;
+    private final EntityMapper entityMapper;
 
     @Override
     public void run(ApplicationArguments args) {
@@ -52,7 +52,7 @@ public class SeedAdminRunner implements ApplicationRunner {
         try {
             RoleDto roleDto = roleService.getByName(Roles.ROLE_ADMIN.name());
             log.trace("Role with name {} found", roleDto.getName());
-            role = roleMapper.toEntity(roleDto, new CycleAvoidingMappingContext());
+            role = entityMapper.toEntity(roleDto, new CycleAvoidingMappingContext());
         } catch (Exception exception) {
             log.error("Role with name {} not found", Roles.ROLE_ADMIN.name(), exception);
             return;
