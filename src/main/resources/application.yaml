@@ -1,0 +1,50 @@
+agiletool:
+  seed-admin:
+    enabled: ${SEED_ADMIN:true}
+
+logging:
+  level:
+    org:
+      springframework:
+        security:
+          config:
+            annotation:
+              authentication:
+                configuration:
+                  InitializeUserDetailsBeanManagerConfigurer: ERROR
+
+spring:
+  application:
+    name: agile-tool
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    password: postgres
+    url: jdbc:postgresql://localhost:5432/retrospective
+    username: postgres
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: agiletool
+        format_sql: true
+        use_sql_comments: true
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    user: postgres
+    password: postgres
+    url: jdbc:postgresql://localhost:5432/retrospective
+    schemas: agiletool
+    create-schemas: true
+    baseline-description: << INIT >>
+    baseline-version: 0
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
